@@ -1,2 +1,7 @@
 # Project Meta data
 .metadata/
+/JavaTestsApplication/nbproject/private/
+/JavaTestsApplication/build/
+/WorkTimeRewerseCalculator/nbproject/private/
+/WorkTimeRewerseCalculator/build/
+/WorkTimeRewerseCalculator/dist/
