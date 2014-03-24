@@ -382,6 +382,7 @@ public class Main {
 
             if(validateProvisioningData(emailText, otaPinText) && updateStorage()) {
                 fillComboBox();
+                setLastItemSelected();
                 showMessageDialog("Saved");
             }
         }
@@ -424,6 +425,14 @@ public class Main {
 
         return true;
     }
+
+    protected void setLastItemSelected() {
+        int itemCount = mHistoryComboBox.getItemCount();
+        if(itemCount > 0) {
+            mHistoryComboBox.setSelectedIndex(itemCount - 1);
+        }
+    }
+
 
     ActionListener mRemoveActionListener = new ActionListener() {
         public void actionPerformed(ActionEvent arg0) {

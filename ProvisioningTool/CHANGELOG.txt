@@ -1,0 +1,2 @@
+0.1.0 - Initial alfa version
+0.1.1 - fixed combo box selector behavior - chose saved item
