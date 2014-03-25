@@ -355,6 +355,7 @@ public class Main {
                 runCommandAndPrintOutput("adb shell input text " + otaPinArray[1]);
                 Thread.sleep(1000);
                 runCommandAndPrintOutput("adb shell input text " + otaPinArray[2]);
+                Thread.sleep(500);
 
                 runCommandAndPrintOutput("adb shell input keyevent 66");
 
