@@ -2,13 +2,13 @@ package jokii;
 
 import java.awt.EventQueue;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.SwingWorker;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -30,6 +30,7 @@ import com.thoughtworks.xstream.XStream;
 import java.awt.event.ActionListener;
 import org.eclipse.wb.swing.FocusTraversalOnArray;
 import java.awt.Component;
+import java.awt.Color;
 
 public class Main {
 
@@ -49,7 +50,6 @@ public class Main {
      * Launch the application.
      */
     public static void main(String[] args) {
-
 
         EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -89,24 +89,32 @@ public class Main {
     private void initialize() {
         readData();
 
+
         mFrame = new JFrame();
+        mFrame.getContentPane().setBackground(Color.RED);
+        mFrame.setBackground(Color.RED);
+        mFrame.setForeground(Color.RED);
         mFrame.setTitle("Provisioning Tool");
         mFrame.setResizable(false);
         mFrame.setBounds(100, 100, 718, 430);
         mFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mFrame.getContentPane().setLayout(null);
+        setApplicationIcon();
 
         JButton btnProvision = new JButton("Provision");
+        btnProvision.setBackground(Color.ORANGE);
         btnProvision.addActionListener(mProvisionActionListener);
         btnProvision.setBounds(10, 357, 89, 23);
         mFrame.getContentPane().add(btnProvision);
 
         JButton btnExit = new JButton("Exit");
+        btnExit.setBackground(Color.ORANGE);
         btnExit.addActionListener(mExitActionListener);
         btnExit.setBounds(109, 357, 89, 23);
         mFrame.getContentPane().add(btnExit);
 
         mEmailTextField = new JTextField();
+        mEmailTextField.setBackground(Color.WHITE);
         mEmailTextField.setBounds(10, 25, 266, 20);
         mFrame.getContentPane().add(mEmailTextField);
         mEmailTextField.setColumns(10);
@@ -125,6 +133,8 @@ public class Main {
         mFrame.getContentPane().add(lblOta);
 
         mConsoleOutputJTextPane = new JTextPane();
+        mConsoleOutputJTextPane.setForeground(Color.BLACK);
+        mConsoleOutputJTextPane.setBackground(Color.WHITE);
         mConsoleOutputJTextPane.setEditable(false);
         mConsoleOutputJTextPane.setBounds(10, 141, 692, 173);
         mFrame.getContentPane().add(mConsoleOutputJTextPane);
@@ -134,6 +144,7 @@ public class Main {
         mFrame.getContentPane().add(lblConsoleOutput);
 
         mHistoryComboBox = new JComboBox<String>();
+        mHistoryComboBox.setBackground(Color.ORANGE);
         mHistoryComboBox.setBounds(518, 54, 181, 23);
 
         fillComboBox();
@@ -151,16 +162,19 @@ public class Main {
         mFrame.getContentPane().add(lblDescription);
 
         mBtnSave = new JButton("Save");
+        mBtnSave.setBackground(Color.ORANGE);
         mBtnSave.addActionListener(mSaveActionListener);
         mBtnSave.setBounds(286, 54, 89, 23);
         mFrame.getContentPane().add(mBtnSave);
 
         JButton mRemoveBtn = new JButton("Remove");
+        mRemoveBtn.setBackground(Color.ORANGE);
         mRemoveBtn.addActionListener(mRemoveActionListener);
         mRemoveBtn.setBounds(419, 54, 89, 23);
         mFrame.getContentPane().add(mRemoveBtn);
 
         JButton button = new JButton("?");
+        button.setBackground(Color.ORANGE);
         button.addActionListener(mAboutActionListener);
         button.setBounds(696, 378, 16, 23);
         mFrame.getContentPane().add(button);
@@ -557,5 +571,15 @@ public class Main {
         Pattern pattern = Pattern.compile(OTA_PIN_PATTERN);
         Matcher matcher = pattern.matcher(otaPinText);
         return matcher.matches();
+    }
+    
+    private void setApplicationIcon() {
+        try {
+            ClassLoader cl = this.getClass().getClassLoader();
+            ImageIcon programIcon = new ImageIcon(cl.getResource("red.png"));
+            mFrame.setIconImage(programIcon.getImage());
+         } catch (Exception whoJackedMyIcon) {
+            System.out.println("Could not load program icon.");
+         }
     }
 }
