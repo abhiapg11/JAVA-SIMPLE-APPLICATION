@@ -115,7 +115,7 @@ public class Main {
 
         mEmailTextField = new JTextField();
         mEmailTextField.setBackground(Color.WHITE);
-        mEmailTextField.setBounds(10, 25, 266, 20);
+        mEmailTextField.setBounds(10, 25, 234, 20);
         mFrame.getContentPane().add(mEmailTextField);
         mEmailTextField.setColumns(10);
 
@@ -124,7 +124,7 @@ public class Main {
         mFrame.getContentPane().add(lblEmail);
 
         mOtaPinTextField = new JTextField();
-        mOtaPinTextField.setBounds(286, 25, 222, 20);
+        mOtaPinTextField.setBounds(256, 25, 250, 20);
         mFrame.getContentPane().add(mOtaPinTextField);
         mOtaPinTextField.setColumns(10);
 
@@ -164,13 +164,19 @@ public class Main {
         mBtnSave = new JButton("Save");
         mBtnSave.setBackground(Color.ORANGE);
         mBtnSave.addActionListener(mSaveActionListener);
-        mBtnSave.setBounds(286, 54, 89, 23);
+        mBtnSave.setBounds(256, 54, 83, 23);
         mFrame.getContentPane().add(mBtnSave);
+
+        JButton btnReplace = new JButton("Replace");
+        btnReplace.setBackground(Color.ORANGE);
+        btnReplace.addActionListener(mReplaceActionListener);
+        btnReplace.setBounds(341, 54, 83, 23);
+        mFrame.getContentPane().add(btnReplace);
 
         JButton mRemoveBtn = new JButton("Remove");
         mRemoveBtn.setBackground(Color.ORANGE);
         mRemoveBtn.addActionListener(mRemoveActionListener);
-        mRemoveBtn.setBounds(419, 54, 89, 23);
+        mRemoveBtn.setBounds(426, 54, 83, 23);
         mFrame.getContentPane().add(mRemoveBtn);
 
         JButton button = new JButton("?");
@@ -178,7 +184,7 @@ public class Main {
         button.addActionListener(mAboutActionListener);
         button.setBounds(696, 378, 16, 23);
         mFrame.getContentPane().add(button);
-        mFrame.getContentPane().setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{mEmailTextField, mOtaPinTextField, mDescriptionTextField, mBtnSave, mRemoveBtn, mHistoryComboBox, btnProvision, btnExit}));
+        
 
         if(mStorageData != null && !mStorageData.getList().isEmpty()) {
             ProvisioningItem firstElement = mStorageData.getList().get(0);
@@ -212,6 +218,7 @@ public class Main {
 
     protected void fillInitialDisplayFields() {
         if(mStorageData != null && !mStorageData.getList().isEmpty()) {
+            mHistoryComboBox.setSelectedIndex(0);
             ProvisioningItem firstElement = mStorageData.getList().get(0);
             fillDisplayFields(firstElement.email, firstElement.otaPin, firstElement.description);
         }
@@ -385,23 +392,27 @@ public class Main {
     private ActionListener mSaveActionListener = new ActionListener() {
 
         public void actionPerformed(ActionEvent e) {
-            String emailText  = mEmailTextField.getText();
-            String otaPinText = mOtaPinTextField.getText();
-
-            if(emailText.isEmpty() 
-                || otaPinText.isEmpty()
-                || mDescriptionTextField.getText().isEmpty()) {
-                showMessageDialog("Please fill all fields");
-                return;
-            }
-
-            if(validateProvisioningData(emailText, otaPinText) && updateStorage()) {
-                fillComboBox();
-                setLastItemSelected();
+            if(trySaveCurrent()) {
                 showMessageDialog("Saved");
             }
         }
     };
+
+    private boolean isCurrentItemAlreadyExist() {
+        boolean isItemAlreadyExist = false;
+
+        if(mStorageData != null) {
+
+            ProvisioningItem data = new ProvisioningItem();
+            data.email       = mEmailTextField.getText();
+            data.otaPin      = mOtaPinTextField.getText();
+            data.description = mDescriptionTextField.getText();
+
+            isItemAlreadyExist = mStorageData.getList().contains(data);
+        }
+
+        return isItemAlreadyExist;
+    }
 
 
     public boolean updateStorage() {
@@ -410,8 +421,8 @@ public class Main {
         }
 
         ProvisioningItem data = new ProvisioningItem();
-        data.email 		 = mEmailTextField.getText();
-        data.otaPin 	 = mOtaPinTextField.getText();
+        data.email       = mEmailTextField.getText();
+        data.otaPin      = mOtaPinTextField.getText();
         data.description = mDescriptionTextField.getText();
 
         if(!mStorageData.getList().contains(data)) {
@@ -446,6 +457,84 @@ public class Main {
         if(itemCount > 0) {
             mHistoryComboBox.setSelectedIndex(itemCount - 1);
         }
+    }
+
+
+    ActionListener mReplaceActionListener = new ActionListener() {
+
+        public void actionPerformed(ActionEvent arg0) {
+            int currentItem = mHistoryComboBox.getSelectedIndex();
+
+            if(currentItem != -1) {
+
+                if(validateFields()) {
+
+                    if(isCurrentItemAlreadyExist()) {
+                        showErrorDialog("Entry already exist");
+                    } else {
+                        String itemDescription = mStorageData.getList().get(currentItem).description;
+                        boolean result = showConfirmDialog("Are you sure you want to replace with\n\n\"" + itemDescription + "\"\n\n");
+
+                        if(result && trySaveCurrent()) {
+                            mHistoryComboBox.removeItemAt(currentItem);
+
+                            mStorageData.getList().remove(currentItem);
+
+                            FileOutputStream fos = null;
+                            try {
+                                fos = new FileOutputStream(ProjectConst.DATA_FILE_NAME);
+                                mXstream.toXML(mStorageData, fos);
+                            } catch (FileNotFoundException e1) {
+                                e1.printStackTrace();
+                                showErrorDialog("Storage access denny");
+                            } finally {
+                                try {
+                                    if(fos != null) {
+                                        fos.close();
+                                    }
+                                } catch (IOException e1) {
+                                    e1.printStackTrace();
+                                }
+                            }
+                            setLastItemSelected();
+                        }
+                    }
+
+                }
+            }
+        }
+    };
+
+    private boolean validateFields() {
+        String emailText  = mEmailTextField.getText();
+        String otaPinText = mOtaPinTextField.getText();
+        boolean isSuccess = false;
+        
+        if(!emailText.isEmpty() 
+                && !otaPinText.isEmpty()
+                && !mDescriptionTextField.getText().isEmpty()) {
+            
+            if(validateProvisioningData(emailText, otaPinText)) {
+                isSuccess = true;
+            }
+        } else {
+            showMessageDialog("Please fill all fields");
+        }
+
+        return isSuccess;
+    }
+
+    private boolean trySaveCurrent() {
+        boolean isSuccess = false;
+        
+        if(validateFields() && updateStorage()) {
+            
+            fillComboBox();
+            setLastItemSelected();
+            isSuccess = true;
+        }
+        return isSuccess;
+
     }
 
 

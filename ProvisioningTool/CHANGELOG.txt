@@ -1,4 +1,5 @@
 0.1.0 - Initial alfa version
 0.1.1 - fixed combo box selector behavior - chose saved item
-0.1.2 - Added 0.5s delay after entering last pin part 
-0.2.0 - Added colors and program icon  
+0.1.2 - Added 0.5s delay after entering last pin part
+0.2.0 - Added colors and program icon
+0.3.0 - Added "Replace" button, some code refactoring
