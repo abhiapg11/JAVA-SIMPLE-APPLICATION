@@ -206,6 +206,8 @@ public class Main {
                 fillDisplayFields(chosenConfiguration.email, chosenConfiguration.otaPin, chosenConfiguration.description);
             }
         }
+        
+        
     };
 
 
@@ -240,6 +242,7 @@ public class Main {
 
     private ActionListener mProvisionActionListener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
+            prepareInputTexts();
             try {
                 String email  = mEmailTextField.getText();
                 String otaPin = mOtaPinTextField.getText();
@@ -392,6 +395,8 @@ public class Main {
     private ActionListener mSaveActionListener = new ActionListener() {
 
         public void actionPerformed(ActionEvent e) {
+            prepareInputTexts();
+
             if(trySaveCurrent()) {
                 showMessageDialog("Saved");
             }
@@ -464,6 +469,7 @@ public class Main {
 
         public void actionPerformed(ActionEvent arg0) {
             int currentItem = mHistoryComboBox.getSelectedIndex();
+            prepareInputTexts();
 
             if(currentItem != -1) {
 
@@ -534,7 +540,13 @@ public class Main {
             isSuccess = true;
         }
         return isSuccess;
+    }
 
+    private void prepareInputTexts() {
+        String email  = mEmailTextField.getText();
+        String otaPin = mOtaPinTextField.getText();
+        mEmailTextField.setText(email.trim());
+        mOtaPinTextField.setText(otaPin.trim());
     }
 
 
