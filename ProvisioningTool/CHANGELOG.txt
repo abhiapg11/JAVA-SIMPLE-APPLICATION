@@ -4,3 +4,5 @@
 0.2.0 - Added colors and program icon
 0.3.0 - Added "Replace" button, some code refactoring
 0.3.1 - Added trimming input fields for email and PIN when press: "Save", "Replace" and "Provision" button
+0.3.2 - Changed build JAVA version to 1.6
+      - Fixed "OTA PIN" label position

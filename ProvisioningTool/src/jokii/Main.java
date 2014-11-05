@@ -28,8 +28,6 @@ import javax.swing.JTextPane;
 import javax.swing.JComboBox;
 import com.thoughtworks.xstream.XStream;
 import java.awt.event.ActionListener;
-import org.eclipse.wb.swing.FocusTraversalOnArray;
-import java.awt.Component;
 import java.awt.Color;
 
 public class Main {
@@ -129,7 +127,7 @@ public class Main {
         mOtaPinTextField.setColumns(10);
 
         JLabel lblOta = new JLabel("OTA PIN");
-        lblOta.setBounds(286, 11, 46, 14);
+        lblOta.setBounds(256, 11, 46, 14);
         mFrame.getContentPane().add(lblOta);
 
         mConsoleOutputJTextPane = new JTextPane();
