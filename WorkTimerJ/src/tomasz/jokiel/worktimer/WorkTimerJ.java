@@ -176,7 +176,7 @@ public class WorkTimerJ {
      */
     private void initialize() {
         frame = new JFrame();
-        frame.setBounds(100, 100, 600, 300);
+        frame.setBounds(100, 100, 640, 312);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
 
@@ -199,11 +199,11 @@ public class WorkTimerJ {
         frame.getContentPane().add(lblTimeControll);
     
         JLabel lblGlobalDelta = new JLabel("Global delta:");
-        lblGlobalDelta.setBounds(10, 236, 69, 14);
+        lblGlobalDelta.setBounds(10, 236, 100, 14);
         frame.getContentPane().add(lblGlobalDelta);
     
         JLabel lblTodayLeft = new JLabel("Today left:");
-        lblTodayLeft.setBounds(462, 9, 60, 14);
+        lblTodayLeft.setBounds(462, 9, 77, 14);
         frame.getContentPane().add(lblTodayLeft);
     }
 
@@ -348,20 +348,20 @@ public class WorkTimerJ {
         };
 
         mFiveMinuteTimeUnitBlock.setBackground(Color.MAGENTA);
-        mFiveMinuteTimeUnitBlock.setBounds(306, 236, TUB_WIDTH, TUB_HEIGHT);
+        mFiveMinuteTimeUnitBlock.setBounds(306, 236, 20, 14);
         mFiveMinuteTimeUnitBlock.setOnTimeUnitBlockDroppedListener(onTimeUnitBlockDroppedListener);
 
         mTenMinutesTimeUnitBlock.setBackground(Color.ORANGE);
-        mTenMinutesTimeUnitBlock.setBounds(326, 236, TUB_WIDTH, TUB_HEIGHT);
+        mTenMinutesTimeUnitBlock.setBounds(326, 236, 20, 14);
         mTenMinutesTimeUnitBlock.setOnTimeUnitBlockDroppedListener(onTimeUnitBlockDroppedListener);
 
         mHalfHourTimeUnitBlock.setBackground(Color.GREEN);
-        mHalfHourTimeUnitBlock.setBounds(346, 236, TUB_WIDTH, TUB_HEIGHT);
+        mHalfHourTimeUnitBlock.setBounds(346, 236, 20, 14);
         mHalfHourTimeUnitBlock.setOnTimeUnitBlockDroppedListener(onTimeUnitBlockDroppedListener);
 
         mOneHourTimeUnitBlock.setBackground(Color.BLUE);
         mOneHourTimeUnitBlock.setTimeTextColor(Color.WHITE);
-        mOneHourTimeUnitBlock.setBounds(366, 236, TUB_WIDTH, TUB_HEIGHT);
+        mOneHourTimeUnitBlock.setBounds(366, 236, 20, 14);
         mOneHourTimeUnitBlock.setOnTimeUnitBlockDroppedListener(onTimeUnitBlockDroppedListener);
 
         frame.getContentPane().add(mFiveMinuteTimeUnitBlock);
@@ -382,42 +382,42 @@ public class WorkTimerJ {
         timerTextPane1.setEditable(false);
         timerTextPane1.setBackground(SystemColor.menu);
         timerTextPane1.setText("00:00:00");
-        timerTextPane1.setBounds(300, 66, 50, 20);
+        timerTextPane1.setBounds(300, 66, 65, 20);
         frame.getContentPane().add(timerTextPane1);
 
         JTextPane timerTextPane2 = new JTextPane();
         timerTextPane2.setEditable(false);
         timerTextPane2.setBackground(SystemColor.menu);
         timerTextPane2.setText("00:00:00");
-        timerTextPane2.setBounds(300, 92, 50, 20);
+        timerTextPane2.setBounds(300, 92, 65, 20);
         frame.getContentPane().add(timerTextPane2);
 
         JTextPane timerTextPane3 = new JTextPane();
         timerTextPane3.setEditable(false);
         timerTextPane3.setBackground(SystemColor.menu);
         timerTextPane3.setText("00:00:00");
-        timerTextPane3.setBounds(300, 121, 50, 20);
+        timerTextPane3.setBounds(300, 121, 65, 20);
         frame.getContentPane().add(timerTextPane3);
 
         JTextPane timerTextPane4 = new JTextPane();
         timerTextPane4.setEditable(false);
         timerTextPane4.setBackground(SystemColor.menu);
         timerTextPane4.setText("00:00:00");
-        timerTextPane4.setBounds(300, 147, 50, 20);
+        timerTextPane4.setBounds(300, 147, 65, 20);
         frame.getContentPane().add(timerTextPane4);
 
         JTextPane timerTextPane5 = new JTextPane();
         timerTextPane5.setEditable(false);
         timerTextPane5.setBackground(SystemColor.menu);
         timerTextPane5.setText("00:00:00");
-        timerTextPane5.setBounds(300, 173, 50, 20);
+        timerTextPane5.setBounds(300, 173, 65, 20);
         frame.getContentPane().add(timerTextPane5);
 
         JTextPane timerTextPane6 = new JTextPane();
         timerTextPane6.setEditable(false);
         timerTextPane6.setBackground(SystemColor.menu);
         timerTextPane6.setText("00:00:00");
-        timerTextPane6.setBounds(300, 199, 50, 20);
+        timerTextPane6.setBounds(300, 199, 65, 20);
         frame.getContentPane().add(timerTextPane6);
 
         mDayliTimerTaskGroupContainer.get(0).setDayliTimerValueJTextPane(timerTextPane1);
@@ -434,14 +434,14 @@ public class WorkTimerJ {
         mGlbalDeltaTextPane.setEditable(false);
         String globalDeltatimerDisplay = Utils.formatTimerFromSeconds(mWorkTimmerSummary.globalDelta);
         mGlbalDeltaTextPane.setText(globalDeltatimerDisplay);
-        mGlbalDeltaTextPane.setBounds(79, 233, 57, 20);
+        mGlbalDeltaTextPane.setBounds(105, 232, 77, 20);
         frame.getContentPane().add(mGlbalDeltaTextPane);
 
         JTextPane todayLeftTimerTextPane = new JTextPane();
         todayLeftTimerTextPane.setBackground(SystemColor.menu);
         todayLeftTimerTextPane.setEditable(false);
         todayLeftTimerTextPane.setText("-08:00:00");
-        todayLeftTimerTextPane.setBounds(523, 6, 54, 20);
+        todayLeftTimerTextPane.setBounds(542, 5, 66, 20);
         frame.getContentPane().add(todayLeftTimerTextPane);
         mSumatrDayliTimerTaskGroupContainer.setDayliTimerValueJTextPane(todayLeftTimerTextPane);
     }
@@ -450,12 +450,12 @@ public class WorkTimerJ {
         TimeUnitBlocksContainer timeUnitBlocksContainer1 = new TimeUnitBlocksContainer();
         timeUnitBlocksContainer1.setConvertOnAddRemoveTimeUnitBlockListener(mAddRemoveTimeUnitBlockListener);
         timeUnitBlocksContainer1.setBackground(Color.GRAY);
-        timeUnitBlocksContainer1.setBounds(353, 66, 204, 20);
+        timeUnitBlocksContainer1.setBounds(368, 66, 223, 20);
         frame.getContentPane().add(timeUnitBlocksContainer1);
         mTimeUnitBlocksCointainers.add(timeUnitBlocksContainer1);
     
         JLabel trashLabelIconTimer1 = new JLabel("", trashIconSml1, JLabel.CENTER);
-        trashLabelIconTimer1.setBounds(553, 66, 24, 24);
+        trashLabelIconTimer1.setBounds(590, 66, 24, 24);
         trashLabelIconTimer1.addMouseListener(
                 new OnMouseClickListenerEmptyTimeUnitBlocksContainer(timeUnitBlocksContainer1, 
                         mOnRemoveAllTimeUnitBlocksFromCointainerListener));
@@ -464,12 +464,12 @@ public class WorkTimerJ {
         TimeUnitBlocksContainer timeUnitBlocksContainer2 = new TimeUnitBlocksContainer();
         timeUnitBlocksContainer2.setConvertOnAddRemoveTimeUnitBlockListener(mAddRemoveTimeUnitBlockListener);
         timeUnitBlocksContainer2.setBackground(Color.GRAY);
-        timeUnitBlocksContainer2.setBounds(353, 95, 204, 20);
+        timeUnitBlocksContainer2.setBounds(368, 95, 223, 20);
         frame.getContentPane().add(timeUnitBlocksContainer2);
         mTimeUnitBlocksCointainers.add(timeUnitBlocksContainer2);
     
         JLabel trashLabelIconTimer2 = new JLabel("", trashIconSml2, JLabel.CENTER);
-        trashLabelIconTimer2.setBounds(553, 91, 24, 24);
+        trashLabelIconTimer2.setBounds(590, 91, 24, 24);
         trashLabelIconTimer2.addMouseListener(
                 new OnMouseClickListenerEmptyTimeUnitBlocksContainer(timeUnitBlocksContainer2, 
                         mOnRemoveAllTimeUnitBlocksFromCointainerListener));
@@ -478,12 +478,12 @@ public class WorkTimerJ {
         TimeUnitBlocksContainer timeUnitBlocksContainer3 = new TimeUnitBlocksContainer();
         timeUnitBlocksContainer3.setConvertOnAddRemoveTimeUnitBlockListener(mAddRemoveTimeUnitBlockListener);
         timeUnitBlocksContainer3.setBackground(Color.GRAY);
-        timeUnitBlocksContainer3.setBounds(353, 121, 204, 20);
+        timeUnitBlocksContainer3.setBounds(368, 121, 223, 20);
         frame.getContentPane().add(timeUnitBlocksContainer3);
         mTimeUnitBlocksCointainers.add(timeUnitBlocksContainer3);
     
         JLabel trashLabelIconTimer3 = new JLabel("", trashIconSml3, JLabel.CENTER);
-        trashLabelIconTimer3.setBounds(553, 118, 24, 24);
+        trashLabelIconTimer3.setBounds(590, 118, 24, 24);
         trashLabelIconTimer3.addMouseListener(
                 new OnMouseClickListenerEmptyTimeUnitBlocksContainer(timeUnitBlocksContainer3, 
                         mOnRemoveAllTimeUnitBlocksFromCointainerListener));
@@ -492,12 +492,12 @@ public class WorkTimerJ {
         TimeUnitBlocksContainer timeUnitBlocksContainer4 = new TimeUnitBlocksContainer();
         timeUnitBlocksContainer4.setConvertOnAddRemoveTimeUnitBlockListener(mAddRemoveTimeUnitBlockListener);
         timeUnitBlocksContainer4.setBackground(Color.GRAY);
-        timeUnitBlocksContainer4.setBounds(353, 147, 204, 20);
+        timeUnitBlocksContainer4.setBounds(368, 147, 223, 20);
         frame.getContentPane().add(timeUnitBlocksContainer4);
         mTimeUnitBlocksCointainers.add(timeUnitBlocksContainer4);
     
         JLabel trashLabelIconTimer4 = new JLabel("", trashIconSml4, JLabel.CENTER);
-        trashLabelIconTimer4.setBounds(553, 144, 24, 24);
+        trashLabelIconTimer4.setBounds(590, 144, 24, 24);
         trashLabelIconTimer4.addMouseListener(
                 new OnMouseClickListenerEmptyTimeUnitBlocksContainer(timeUnitBlocksContainer4, 
                         mOnRemoveAllTimeUnitBlocksFromCointainerListener));
@@ -506,12 +506,12 @@ public class WorkTimerJ {
         TimeUnitBlocksContainer timeUnitBlocksContainer5 = new TimeUnitBlocksContainer();
         timeUnitBlocksContainer5.setConvertOnAddRemoveTimeUnitBlockListener(mAddRemoveTimeUnitBlockListener);
         timeUnitBlocksContainer5.setBackground(Color.GRAY);
-        timeUnitBlocksContainer5.setBounds(353, 173, 204, 20);
+        timeUnitBlocksContainer5.setBounds(368, 173, 223, 20);
         frame.getContentPane().add(timeUnitBlocksContainer5);
         mTimeUnitBlocksCointainers.add(timeUnitBlocksContainer5);
     
         JLabel trashLabelIconTimer5 = new JLabel("", trashIconSml5, JLabel.CENTER);
-        trashLabelIconTimer5.setBounds(553, 170, 24, 24);
+        trashLabelIconTimer5.setBounds(590, 170, 24, 24);
         trashLabelIconTimer5.addMouseListener(
                 new OnMouseClickListenerEmptyTimeUnitBlocksContainer(timeUnitBlocksContainer5, 
                         mOnRemoveAllTimeUnitBlocksFromCointainerListener));
@@ -520,12 +520,12 @@ public class WorkTimerJ {
         TimeUnitBlocksContainer timeUnitBlocksContainer6 = new TimeUnitBlocksContainer();
         timeUnitBlocksContainer6.setConvertOnAddRemoveTimeUnitBlockListener(mAddRemoveTimeUnitBlockListener);
         timeUnitBlocksContainer6.setBackground(Color.GRAY);
-        timeUnitBlocksContainer6.setBounds(353, 199, 204, 20);
+        timeUnitBlocksContainer6.setBounds(368, 199, 223, 20);
         frame.getContentPane().add(timeUnitBlocksContainer6);
         mTimeUnitBlocksCointainers.add(timeUnitBlocksContainer6);
     
         JLabel trashLabelIconTimer6 = new JLabel("", trashIconSml6, JLabel.CENTER);
-        trashLabelIconTimer6.setBounds(553, 196, 24, 24);
+        trashLabelIconTimer6.setBounds(590, 196, 24, 24);
         trashLabelIconTimer6.addMouseListener(
                 new OnMouseClickListenerEmptyTimeUnitBlocksContainer(timeUnitBlocksContainer6, 
                         mOnRemoveAllTimeUnitBlocksFromCointainerListener));
@@ -541,12 +541,12 @@ public class WorkTimerJ {
         mTrashTimeUnitBlocksContainer = new TimeUnitBlocksContainer();
         mTrashTimeUnitBlocksContainer.setSummable(false);
         mTrashTimeUnitBlocksContainer.setBackground(Color.DARK_GRAY);
-        mTrashTimeUnitBlocksContainer.setBounds(399, 225, 148, 30);
+        mTrashTimeUnitBlocksContainer.setBounds(399, 225, 192, 30);
         frame.getContentPane().add(mTrashTimeUnitBlocksContainer);
         mTimeUnitBlocksCointainers.add(mTrashTimeUnitBlocksContainer);
     
         JLabel trashLabelIcon = new JLabel("", trashIcon, JLabel.CENTER);
-        trashLabelIcon.setBounds(550, 227, 24, 24);
+        trashLabelIcon.setBounds(590, 227, 24, 24);
         trashLabelIcon.addMouseListener(
                 new OnMouseClickListenerEmptyTimeUnitBlocksContainer(mTrashTimeUnitBlocksContainer, 
                         mOnRemoveAllTimeUnitBlocksFromCointainerListener));
@@ -556,7 +556,7 @@ public class WorkTimerJ {
         mDaySummatorTimeUnitBlocksContainer.setConvertOnAddRemoveTimeUnitBlockListener(mAddRemoveTimeUnitBlockListener);
         mDaySummatorTimeUnitBlocksContainer.setSummable(false);
         mDaySummatorTimeUnitBlocksContainer.setBackground(Color.DARK_GRAY);
-        mDaySummatorTimeUnitBlocksContainer.setBounds(353, 27, 219, 23);
+        mDaySummatorTimeUnitBlocksContainer.setBounds(320, 29, 288, 23);
         frame.getContentPane().add(mDaySummatorTimeUnitBlocksContainer);
         mTimeUnitBlocksCointainers.add(mDaySummatorTimeUnitBlocksContainer);
         mSumatrDayliTimerTaskGroupContainer.setTimeUnitBlocksContainer(mDaySummatorTimeUnitBlocksContainer);
