@@ -58,7 +58,7 @@ public class WorkTimerJ {
     private final TimeUnitBlock mHalfHourTimeUnitBlock   = new TimeUnitBlock(HALF_HOUR);
     private final TimeUnitBlock mOneHourTimeUnitBlock    = new TimeUnitBlock(ONE_HOUR);
     
-    private ArrayList<TimeUnitBlocksContainer> mTimeUnitBlocksCointainers = new ArrayList<>(6);
+    private ArrayList<TimeUnitBlocksContainer> mTimeUnitBlocksCointainers = new ArrayList<TimeUnitBlocksContainer>(6);
     private ArrayList<DayliTimerTaskGroup> mDayliTimerTaskGroupContainer = initDayliTimerTaskGroupContainer();
     private DayliTimerTaskGroup mSumatrDayliTimerTaskGroupContainer = new DayliTimerTaskGroup(null);
 

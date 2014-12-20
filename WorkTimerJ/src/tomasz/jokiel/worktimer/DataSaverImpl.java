@@ -87,11 +87,17 @@ public class DataSaverImpl implements DataSaver {
      
             System.out.println("File saved!");
 
-        } catch (ParserConfigurationException | TransformerException e) {
+        } catch (TransformerException e) {
             e.printStackTrace();
-        } catch (SAXException | IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
-        }
+        } catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     private void appendEndOfMonthTag(Document doc, Element WT_SUMMARY, WorkTimmerSummary workTimmerSummary) {

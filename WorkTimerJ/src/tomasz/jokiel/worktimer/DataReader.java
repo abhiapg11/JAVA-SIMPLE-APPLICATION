@@ -49,9 +49,12 @@ public class DataReader {
             }
         } catch (ParserConfigurationException /*| TransformerException*/ e) {
             e.printStackTrace();
-        } catch (SAXException | IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
-        }
+        } catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
         return workTimmerSummary;
     }
@@ -156,6 +159,6 @@ public class DataReader {
         int thisDbGlobalDelta;
         int globalDelta;
         int weeklyDelta;
-        List<String> timersDescriptions = new ArrayList<>();
+        List<String> timersDescriptions = new ArrayList<String>();
     }
 }
