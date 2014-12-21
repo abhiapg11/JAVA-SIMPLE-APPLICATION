@@ -38,7 +38,7 @@ public class WorkTimerJ {
     private static final int TEN_MINUTES  = 10 * 60;
     private static final int HALF_HOUR    = 30 * 60;
     private static final int ONE_HOUR     = 60 * 60;
-    private static final int TUB_WIDTH = 16;
+    private static final int TUB_WIDTH = 20;
     private static final int TUB_HEIGHT = 14;
     private static final int EIGHT_HOURS_IN_SECONDS = 8 * ONE_HOUR;
     private JFrame frame;
@@ -176,6 +176,7 @@ public class WorkTimerJ {
      */
     private void initialize() {
         frame = new JFrame();
+        frame.setResizable(false);
         frame.setBounds(100, 100, 640, 312);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
@@ -348,20 +349,20 @@ public class WorkTimerJ {
         };
 
         mFiveMinuteTimeUnitBlock.setBackground(Color.MAGENTA);
-        mFiveMinuteTimeUnitBlock.setBounds(306, 236, 20, 14);
+        mFiveMinuteTimeUnitBlock.setBounds(306, 236, TUB_WIDTH, TUB_HEIGHT);
         mFiveMinuteTimeUnitBlock.setOnTimeUnitBlockDroppedListener(onTimeUnitBlockDroppedListener);
 
         mTenMinutesTimeUnitBlock.setBackground(Color.ORANGE);
-        mTenMinutesTimeUnitBlock.setBounds(326, 236, 20, 14);
+        mTenMinutesTimeUnitBlock.setBounds(326, 236, TUB_WIDTH, TUB_HEIGHT);
         mTenMinutesTimeUnitBlock.setOnTimeUnitBlockDroppedListener(onTimeUnitBlockDroppedListener);
 
         mHalfHourTimeUnitBlock.setBackground(Color.GREEN);
-        mHalfHourTimeUnitBlock.setBounds(346, 236, 20, 14);
+        mHalfHourTimeUnitBlock.setBounds(346, 236, TUB_WIDTH, TUB_HEIGHT);
         mHalfHourTimeUnitBlock.setOnTimeUnitBlockDroppedListener(onTimeUnitBlockDroppedListener);
 
         mOneHourTimeUnitBlock.setBackground(Color.BLUE);
         mOneHourTimeUnitBlock.setTimeTextColor(Color.WHITE);
-        mOneHourTimeUnitBlock.setBounds(366, 236, 20, 14);
+        mOneHourTimeUnitBlock.setBounds(366, 236, TUB_WIDTH, TUB_HEIGHT);
         mOneHourTimeUnitBlock.setOnTimeUnitBlockDroppedListener(onTimeUnitBlockDroppedListener);
 
         frame.getContentPane().add(mFiveMinuteTimeUnitBlock);
