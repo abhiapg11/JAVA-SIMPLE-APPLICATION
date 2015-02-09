@@ -5,8 +5,7 @@
 - otoczka podœwietlaj¹ca element albo zrobenie go przeŸroczystym trochê, gdy mo¿na go upuœciæ na dany TUB-C, czerwona otoczka gdy nad œmietnikiem lub gdy TUB po raz pierwszy i jeszcze nigdzie nie wrzucony
 - podwójny klik w miejscu myszk¹ na TUB gdy jest w kontenerze powoduje jego rozbiecie na 2-3 mniejsze/sk³adowe TUBy
 - specjalny TUB-C na TUBy nadgodzinowe i niedogodzinowe, które bêd¹ uzupe³niane w przypadku zakoñczenia dnia tym co siê uzbiera³o?
-- nie resizable
-- Timery pamiêtaj¹ ostatnie opisy z bazy danych XMLa po wy³¹czeniu i w³¹czeniu ponownym
+- TUBC pamiêtaj¹ ostatnie wartoœci liczników
 
 TODO BUGS
 !?- Po manualnym ususniêciu TUBow z sumatora, przy updejcie convercie dodaniu blocza 5 min, powracaj¹ (nowe) do (pustego) sumatora 

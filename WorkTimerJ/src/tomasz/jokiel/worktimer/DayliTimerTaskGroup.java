@@ -50,12 +50,19 @@ public class DayliTimerTaskGroup {
             }
         }
     };
-    private final DayliTimer mDayliTimer = new DayliTimer(mOnTimerRepeatListener);
-    private TimeUnitBlocksContainer mTimeUnitBlocksContainer;
+    private String mName;
+    protected DayliTimer mDayliTimer = new DayliTimer(mOnTimerRepeatListener);
+    protected TimeUnitBlocksContainer mTimeUnitBlocksContainer;
 
 
     public DayliTimerTaskGroup(OnUpdateDayliTimerValueListener onOnUpdateDayliTimerValueListener) {
         mOnUpdateDayliTimerValueListener =  onOnUpdateDayliTimerValueListener;
+    }
+
+    public DayliTimerTaskGroup(OnUpdateDayliTimerValueListener onOnUpdateDayliTimerValueListener, String name) {
+        this(onOnUpdateDayliTimerValueListener);
+        mName = name;
+        mDayliTimer = new DayliTimer(mOnTimerRepeatListener, name);
     }
 
     public JRadioButton getRadioButton() {
@@ -99,8 +106,8 @@ public class DayliTimerTaskGroup {
         mDayliTimer.reset();
         updateDayliTimerValue();
     }
-    
-    private boolean isTimeUnitBlockAddedManuallyToContainer() {
+
+    protected boolean isTimeUnitBlockAddedManuallyToContainer() {
         return mTimeUnitBlocksContainer.sumAllTimeUnitBlockInSeconds() > mDayliTimer.getCounterValue();
     }
 
@@ -110,7 +117,7 @@ public class DayliTimerTaskGroup {
             mDayliTimerValue.setText(Utils.formatTimerFromSeconds(counterValue, "", "-"));
         }
     }
-    
+
     private void notifyFiveMinutesMultiplyExpires() {
         if (mOnUpdateDayliTimerValueListener != null) {
             mOnUpdateDayliTimerValueListener.onUpdateDayliTimerValueByFiveMinutes(mTimeUnitBlocksContainer);
@@ -130,5 +137,10 @@ public class DayliTimerTaskGroup {
     public interface OnUpdateDayliTimerValueListener {
         public void onUpdateDayliTimerValueByFiveMinutes(TimeUnitBlocksContainer timeUnitBlocksContainer);
         public void onUpdateDayliTimerValue();
+    }
+    
+    @Override
+    public String toString() {
+        return super.toString() + ", name: " + mName;
     }
 }

@@ -28,8 +28,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JTextPane;
@@ -63,7 +61,7 @@ public class WorkTimerJ {
     
     private ArrayList<TimeUnitBlocksContainer> mTimeUnitBlocksCointainers = new ArrayList<TimeUnitBlocksContainer>(6);
     private ArrayList<DayliTimerTaskGroup> mDayliTimerTaskGroupContainer = initDayliTimerTaskGroupContainer();
-    private DayliTimerTaskGroup mSumatrDayliTimerTaskGroupContainer = new DayliTimerTaskGroup(null);
+    private DayliTimerTaskGroup mSumatorDayliTimerTaskGroupContainer = new SumatorDayliTimerTaskGroup(null);
 
     protected int firstTimeUnitBoxZIndex;
 
@@ -159,17 +157,17 @@ public class WorkTimerJ {
 
                     @Override
                     public void onUpdateDayliTimerValue() {
-                        mSumatrDayliTimerTaskGroupContainer.getDayliTimer().addToCounterValue(1);
+                        mSumatorDayliTimerTaskGroupContainer.getDayliTimer().addToCounterValue(1);
                     }
 
                 };
 
-                add(new DayliTimerTaskGroup(listener));
-                add(new DayliTimerTaskGroup(listener));
-                add(new DayliTimerTaskGroup(listener));
-                add(new DayliTimerTaskGroup(listener));
-                add(new DayliTimerTaskGroup(listener));
-                add(new DayliTimerTaskGroup(listener));
+                add(new DayliTimerTaskGroup(listener, "counter_1"));
+                add(new DayliTimerTaskGroup(listener, "counter_2"));
+                add(new DayliTimerTaskGroup(listener, "counter_3"));
+                add(new DayliTimerTaskGroup(listener, "counter_4"));
+                add(new DayliTimerTaskGroup(listener, "counter_5"));
+                add(new DayliTimerTaskGroup(listener, "counter_6"));
             }
         };
     }
@@ -194,7 +192,7 @@ public class WorkTimerJ {
         initTimeUnitBlocks();
         initTimeUnitBlocksContainers();
         initDayliTimerValues();
-        initGlobalTimeralues();
+        initGlobalTimerValues();
 
     }
 
@@ -377,15 +375,31 @@ public class WorkTimerJ {
         firstTimeUnitBoxZIndex = frame.getContentPane().getComponentZOrder(mFiveMinuteTimeUnitBlock);
     }
 
-    private void initSumatrDayliTimerTaskGroupContainer() {
-        mSumatrDayliTimerTaskGroupContainer.reset();
+    private void reserSumatrDayliTimerTaskGroupContainer() {
+        int initialCounterValue = -EIGHT_HOURS_IN_SECONDS;
+        setValueOfSumatrDayliTimerTaskGroupContainer(initialCounterValue);
+    }
+
+    private void initDefaultSumatrDayliTimerTaskGroupContainer() {
         int initialCounterValue = -EIGHT_HOURS_IN_SECONDS;
 
-        if(mWorkTimmerSummary.dayliTimerValue != null) {
-            initialCounterValue = mWorkTimmerSummary.dayliTimerValue;
+        if(getStoredDayliTimerValue() != null) {
+            initialCounterValue = getStoredDayliTimerValue();
         }
 
-        mSumatrDayliTimerTaskGroupContainer.getDayliTimer().addToCounterValue(initialCounterValue);
+        setValueOfSumatrDayliTimerTaskGroupContainer(initialCounterValue);
+    }
+
+    private void setValueOfSumatrDayliTimerTaskGroupContainer(Integer initialCounterValue) {
+        mSumatorDayliTimerTaskGroupContainer.getDayliTimer().addToCounterValue(initialCounterValue);
+    }
+
+    private Integer getStoredDayliTimerValue() {
+        return mWorkTimmerSummary.dayliTimerValue;
+    }
+
+    private void clearDayliTimerValue() {
+        mWorkTimmerSummary.dayliTimerValue = null;
     }
 
     private void initDayliTimerValues() {
@@ -437,9 +451,18 @@ public class WorkTimerJ {
         mDayliTimerTaskGroupContainer.get(3).setDayliTimerValueJTextPane(timerTextPane4);
         mDayliTimerTaskGroupContainer.get(4).setDayliTimerValueJTextPane(timerTextPane5);
         mDayliTimerTaskGroupContainer.get(5).setDayliTimerValueJTextPane(timerTextPane6);
+        
+        if(!mWorkTimmerSummary.timersCounterValues.isEmpty()) {
+            timerTextPane1.setText(Utils.formatTimerFromSeconds(mWorkTimmerSummary.timersCounterValues.get(0), "", "-"));
+            timerTextPane2.setText(Utils.formatTimerFromSeconds(mWorkTimmerSummary.timersCounterValues.get(1), "", "-"));
+            timerTextPane3.setText(Utils.formatTimerFromSeconds(mWorkTimmerSummary.timersCounterValues.get(2), "", "-"));
+            timerTextPane4.setText(Utils.formatTimerFromSeconds(mWorkTimmerSummary.timersCounterValues.get(3), "", "-"));
+            timerTextPane5.setText(Utils.formatTimerFromSeconds(mWorkTimmerSummary.timersCounterValues.get(4), "", "-"));
+            timerTextPane6.setText(Utils.formatTimerFromSeconds(mWorkTimmerSummary.timersCounterValues.get(5), "", "-"));
+        }
     }
 
-    private void initGlobalTimeralues() {
+    private void initGlobalTimerValues() {
         mGlbalDeltaTextPane = new JTextPane();
         mGlbalDeltaTextPane.setBackground(SystemColor.menu);
         mGlbalDeltaTextPane.setEditable(false);
@@ -454,14 +477,14 @@ public class WorkTimerJ {
         
         String todayLeftTimerDisplay = "-08:00:00";
 
-        if(mWorkTimmerSummary.dayliTimerValue != null) {
-            todayLeftTimerDisplay = Utils.formatTimerFromSeconds(mWorkTimmerSummary.dayliTimerValue);
+        if(getStoredDayliTimerValue() != null) {
+            todayLeftTimerDisplay = Utils.formatTimerFromSeconds(getStoredDayliTimerValue());
         }
 
         todayLeftTimerTextPane.setText(todayLeftTimerDisplay);
         todayLeftTimerTextPane.setBounds(542, 5, 66, 20);
         frame.getContentPane().add(todayLeftTimerTextPane);
-        mSumatrDayliTimerTaskGroupContainer.setDayliTimerValueJTextPane(todayLeftTimerTextPane);
+        mSumatorDayliTimerTaskGroupContainer.setDayliTimerValueJTextPane(todayLeftTimerTextPane);
     }
 
     private void initTimeUnitBlocksContainers() {
@@ -577,15 +600,26 @@ public class WorkTimerJ {
         mDaySummatorTimeUnitBlocksContainer.setBounds(320, 29, 288, 23);
         frame.getContentPane().add(mDaySummatorTimeUnitBlocksContainer);
         mTimeUnitBlocksCointainers.add(mDaySummatorTimeUnitBlocksContainer);
-        mSumatrDayliTimerTaskGroupContainer.setTimeUnitBlocksContainer(mDaySummatorTimeUnitBlocksContainer);
-        initSumatrDayliTimerTaskGroupContainer();
+        mSumatorDayliTimerTaskGroupContainer.setTimeUnitBlocksContainer(mDaySummatorTimeUnitBlocksContainer);
+
+        initDefaultSumatrDayliTimerTaskGroupContainer();
+
+        initDayliTimersValues();
+    }
+
+    private void initDayliTimersValues() {
+        if(!mWorkTimmerSummary.timersCounterValues.isEmpty()) {
+            for(int i = 0; i < mDayliTimerTaskGroupContainer.size(); i++) {
+                mDayliTimerTaskGroupContainer.get(i).getDayliTimer().addToCounterValue(mWorkTimmerSummary.timersCounterValues.get(i));
+            }
+        }
     }
     
     private OnWindowCloseListener getOnApplicationCloseListener() {
         return new OnWindowCloseListener() {
             @Override
             public void onWindowClose() {
-                mDataSaver.storeTimersValues(mDayliTimerTaskGroupContainer, mSumatrDayliTimerTaskGroupContainer);
+                mDataSaver.storeTimersValues(mDayliTimerTaskGroupContainer, mSumatorDayliTimerTaskGroupContainer);
             }
         };
     }
@@ -660,7 +694,7 @@ public class WorkTimerJ {
             group.reset();
         }
 
-        initSumatrDayliTimerTaskGroupContainer();
+        reserSumatrDayliTimerTaskGroupContainer();
     }
 
     private DayliTimerTaskGroup getSelectedDayliTimerTaskGroup() {
@@ -888,7 +922,7 @@ public class WorkTimerJ {
             mDataSaver.storeReleasedTimersValues(endOfWeekCheckBox.isSelected(), 
                                                  endOfMonthCheckBox.isSelected(), 
                                                  mDayliTimerTaskGroupContainer, 
-                                                 mSumatrDayliTimerTaskGroupContainer);
+                                                 mSumatorDayliTimerTaskGroupContainer);
             
             updateGlobalDeltaTimerAtHoursRelease();
         }
@@ -900,7 +934,7 @@ public class WorkTimerJ {
 
     private void updateGlobalDeltaTimerAtHoursRelease() {
         String globalDeltatimerDisplay = Utils.formatTimerFromSeconds(mWorkTimmerSummary.globalDelta + 
-                                             mSumatrDayliTimerTaskGroupContainer.getDayliTimer().getCounterValue());
+                                             mSumatorDayliTimerTaskGroupContainer.getDayliTimer().getCounterValue());
         mGlbalDeltaTextPane.setText(globalDeltatimerDisplay);
     }
 }

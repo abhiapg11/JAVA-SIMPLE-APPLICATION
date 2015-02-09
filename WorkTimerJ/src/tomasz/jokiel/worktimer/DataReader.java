@@ -136,7 +136,7 @@ public class DataReader {
 
     private static String getSingleGlobalStringElementValue(Document doc, String tagName) {
         Node glbalDeltaElement = doc.getElementsByTagName(tagName).item(0);
-        return glbalDeltaElement.getTextContent();
+        return glbalDeltaElement != null ? glbalDeltaElement.getTextContent() : "";
     }
 
     

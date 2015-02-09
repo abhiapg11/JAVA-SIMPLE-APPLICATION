@@ -12,11 +12,17 @@ public class DayliTimer implements ActionListener {
     private int mCounterValue;
     private Timer mTimer;
     private OnCounterValueChangedListener mOnCounterValueChangedListener;
+    private String mName;
 
     public DayliTimer(OnCounterValueChangedListener listener) {
         mOnCounterValueChangedListener = listener;
         mTimer = new Timer(REPEAT_TIME, this);
         mTimer.setInitialDelay(REPEAT_TIME);
+    }
+
+    public DayliTimer(OnCounterValueChangedListener listener, String name) {
+        this(listener);
+        mName = name;
     }
 
     public void start() {
@@ -68,5 +74,10 @@ public class DayliTimer implements ActionListener {
     public interface OnCounterValueChangedListener {
         public void onCounterValueChanged(int counterValue);
         public void onCounterManuallyChanged(int counterValue);
+    }
+    
+    @Override
+    public String toString() {
+        return super.toString() + ", name: " + mName + ", counter calue: " + getCounterValue();
     }
 }
