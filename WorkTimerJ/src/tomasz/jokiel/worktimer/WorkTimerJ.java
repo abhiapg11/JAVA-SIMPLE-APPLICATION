@@ -376,6 +376,7 @@ public class WorkTimerJ {
     }
 
     private void reserSumatrDayliTimerTaskGroupContainer() {
+        mSumatorDayliTimerTaskGroupContainer.reset();
         int initialCounterValue = -EIGHT_HOURS_IN_SECONDS;
         setValueOfSumatrDayliTimerTaskGroupContainer(initialCounterValue);
     }
@@ -396,10 +397,6 @@ public class WorkTimerJ {
 
     private Integer getStoredDayliTimerValue() {
         return mWorkTimmerSummary.dayliTimerValue;
-    }
-
-    private void clearDayliTimerValue() {
-        mWorkTimmerSummary.dayliTimerValue = null;
     }
 
     private void initDayliTimerValues() {
