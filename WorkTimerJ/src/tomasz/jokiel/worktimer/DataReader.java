@@ -28,7 +28,6 @@ public class DataReader {
 
             File dataBaseFile = new File(DataBaseScheme.DATA_BASE_FILE_NAME);
 
-
             if(dataBaseFile.exists()) {
                 doc = docBuilder.parse(dataBaseFile);
                 doc.getDocumentElement().normalize();
@@ -40,10 +39,16 @@ public class DataReader {
                 int weeklyDelta = getSingleGlobalIntElementValue(doc, DataBaseScheme.WT_CONFIG_DATA_WEEK_DELTA_TAG_NAME);
                 workTimmerSummary.weeklyDelta = weeklyDelta;
                 System.out.println("##_DataReader, week delta = " + weeklyDelta);
-                
-                List<String> timersDescriptions = getStringListContent(doc, DataBaseScheme.WT_CONFIG_DATA_TIMERS_TAG_NAME);
+
+                int dayliTimerValue = getSingleGlobalIntElementValue(doc, DataBaseScheme.WT_WINDOW_CLOSE_CONFIG_DATA_DAYLI_TIMER_TAG_NAME);
+                workTimmerSummary.dayliTimerValue = dayliTimerValue;
+
+                List<String> timersDescriptions = getStringListContent(doc, DataBaseScheme.WT_WINDOW_CLOSE_CONFIG_DATA_TIMERS_TAG_NAME);
                 workTimmerSummary.timersDescriptions = timersDescriptions;
-                
+
+                List<Integer> timersCounterValues = getIntegerListContent(doc, DataBaseScheme.WT_WINDOW_CLOSE_CONFIG_DATA_TIMERS_VAL_TAG_NAME);
+                workTimmerSummary.timersCounterValues = timersCounterValues;
+
                 int thisDbGlobalDelta = calculateDbGlobalDelta(doc);
                 workTimmerSummary.thisDbGlobalDelta = thisDbGlobalDelta;
             }
@@ -52,9 +57,8 @@ public class DataReader {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            e.printStackTrace();
+        }
 
         return workTimmerSummary;
     }
@@ -135,16 +139,31 @@ public class DataReader {
         return glbalDeltaElement.getTextContent();
     }
 
-
+    
     private static List<String> getStringListContent(Document doc, String tagName) {
         List<String> stringListContent = new ArrayList<String>();
         Node timerDescriptionElement = doc.getElementsByTagName(tagName).item(0);
         NodeList timerDescriptionNodes = timerDescriptionElement.getChildNodes();
-
+        
         for (int i = 0; i < timerDescriptionNodes.getLength(); i++) {
             if(!isNewLineNode(timerDescriptionNodes.item(i))) {
                 String textContent = timerDescriptionNodes.item(i).getTextContent();
                 stringListContent.add(textContent);
+            }
+        }
+        
+        return stringListContent;
+    }
+
+    private static List<Integer> getIntegerListContent(Document doc, String tagName) {
+        List<Integer> stringListContent = new ArrayList<Integer>();
+        Node timerCounterValueElement = doc.getElementsByTagName(tagName).item(0);
+        NodeList timerDescriptionNodes = timerCounterValueElement.getChildNodes();
+
+        for (int i = 0; i < timerDescriptionNodes.getLength(); i++) {
+            if(!isNewLineNode(timerDescriptionNodes.item(i))) {
+                int intContent = Integer.valueOf(timerDescriptionNodes.item(i).getTextContent());
+                stringListContent.add(intContent);
             }
         }
 
@@ -159,6 +178,8 @@ public class DataReader {
         int thisDbGlobalDelta;
         int globalDelta;
         int weeklyDelta;
+        Integer dayliTimerValue = null;
         List<String> timersDescriptions = new ArrayList<String>();
+        List<Integer> timersCounterValues = new ArrayList<Integer>();
     }
 }

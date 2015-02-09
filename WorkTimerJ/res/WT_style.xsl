@@ -15,8 +15,6 @@
 		</html>
 	</xsl:template>
 
-    <xsl:template match="WT_CONFIG_DATA" priority="0" /> <!-- hidden configuration data -->
-    
 	<xsl:template match="WT_LISTING">
 		<p/>
 		<div align="center">

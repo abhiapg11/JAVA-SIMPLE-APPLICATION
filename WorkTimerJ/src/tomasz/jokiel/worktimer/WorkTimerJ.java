@@ -21,12 +21,15 @@ import tomasz.jokiel.worktimer.DayliTimerTaskGroup.OnUpdateDayliTimerValueListen
 import tomasz.jokiel.worktimer.OnMouseClickListenerEmptyTimeUnitBlocksContainer.OnRemoveAllTimeUnitBlocksFromCointainerListener;
 import tomasz.jokiel.worktimer.TimeUnitBlock.OnTimeUnitBlockDroppedListener;
 import tomasz.jokiel.worktimer.TimeUnitBlocksContainer.OnConvertAddRemoveTimeUnitBlockListener;
+import tomasz.jokiel.worktimer.WindowCloseListener.OnWindowCloseListener;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JTextPane;
@@ -180,6 +183,7 @@ public class WorkTimerJ {
         frame.setBounds(100, 100, 640, 312);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
+        frame.addWindowListener(new WindowCloseListener(getOnApplicationCloseListener()));
 
         mWorkTimmerSummary = DataReader.readDataBase();
 
@@ -375,7 +379,13 @@ public class WorkTimerJ {
 
     private void initSumatrDayliTimerTaskGroupContainer() {
         mSumatrDayliTimerTaskGroupContainer.reset();
-        mSumatrDayliTimerTaskGroupContainer.getDayliTimer().addToCounterValue(-EIGHT_HOURS_IN_SECONDS);
+        int initialCounterValue = -EIGHT_HOURS_IN_SECONDS;
+
+        if(mWorkTimmerSummary.dayliTimerValue != null) {
+            initialCounterValue = mWorkTimmerSummary.dayliTimerValue;
+        }
+
+        mSumatrDayliTimerTaskGroupContainer.getDayliTimer().addToCounterValue(initialCounterValue);
     }
 
     private void initDayliTimerValues() {
@@ -441,7 +451,14 @@ public class WorkTimerJ {
         JTextPane todayLeftTimerTextPane = new JTextPane();
         todayLeftTimerTextPane.setBackground(SystemColor.menu);
         todayLeftTimerTextPane.setEditable(false);
-        todayLeftTimerTextPane.setText("-08:00:00");
+        
+        String todayLeftTimerDisplay = "-08:00:00";
+
+        if(mWorkTimmerSummary.dayliTimerValue != null) {
+            todayLeftTimerDisplay = Utils.formatTimerFromSeconds(mWorkTimmerSummary.dayliTimerValue);
+        }
+
+        todayLeftTimerTextPane.setText(todayLeftTimerDisplay);
         todayLeftTimerTextPane.setBounds(542, 5, 66, 20);
         frame.getContentPane().add(todayLeftTimerTextPane);
         mSumatrDayliTimerTaskGroupContainer.setDayliTimerValueJTextPane(todayLeftTimerTextPane);
@@ -564,6 +581,15 @@ public class WorkTimerJ {
         initSumatrDayliTimerTaskGroupContainer();
     }
     
+    private OnWindowCloseListener getOnApplicationCloseListener() {
+        return new OnWindowCloseListener() {
+            @Override
+            public void onWindowClose() {
+                mDataSaver.storeTimersValues(mDayliTimerTaskGroupContainer, mSumatrDayliTimerTaskGroupContainer);
+            }
+        };
+    }
+
     private ItemListener getStartPauseItemListener() {
         return new ItemListener() {
             
