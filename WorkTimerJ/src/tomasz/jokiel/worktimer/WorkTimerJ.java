@@ -39,7 +39,8 @@ public class WorkTimerJ {
     private static final int TEN_MINUTES  = 10 * 60;
     private static final int HALF_HOUR    = 30 * 60;
     private static final int ONE_HOUR     = 60 * 60;
-    private static final int TUB_WIDTH = 20;
+    private static final int TWO_HOUR     =  2 * 60 * 60;
+    private static final int TUB_WIDTH = 23;
     private static final int TUB_HEIGHT = 14;
     private static final int EIGHT_HOURS_IN_SECONDS = 8 * ONE_HOUR;
     private JFrame frame;
@@ -58,6 +59,7 @@ public class WorkTimerJ {
     private final TimeUnitBlock mTenMinutesTimeUnitBlock  = new TimeUnitBlock(TEN_MINUTES);
     private final TimeUnitBlock mHalfHourTimeUnitBlock   = new TimeUnitBlock(HALF_HOUR);
     private final TimeUnitBlock mOneHourTimeUnitBlock    = new TimeUnitBlock(ONE_HOUR);
+    private final TimeUnitBlock mTwoHoursTimeUnitBlock    = new TimeUnitBlock(TWO_HOUR);
     
     private ArrayList<TimeUnitBlocksContainer> mTimeUnitBlocksCointainers = new ArrayList<TimeUnitBlocksContainer>(6);
     private ArrayList<DayliTimerTaskGroup> mDayliTimerTaskGroupContainer = initDayliTimerTaskGroupContainer();
@@ -113,6 +115,12 @@ public class WorkTimerJ {
         public void onAddOneHourTimeUnitBlockRequested(
                 TimeUnitBlocksContainer timeUnitBlocksContainer) {
             addOneHourTimeUnitBlockToContainer(timeUnitBlocksContainer);
+        }
+
+        @Override
+        public void onAddTwoHoursTimeUnitBlockRequested(
+                TimeUnitBlocksContainer timeUnitBlocksContainer) {
+            addTwoHoursTimeUnitBlockToContainer(timeUnitBlocksContainer);
         }
     };
 
@@ -190,9 +198,9 @@ public class WorkTimerJ {
         initDayliTimersTasksDescriptions();
         initTimeControlButtons();
         initTimeUnitBlocks();
-        initTimeUnitBlocksContainers();
         initDayliTimerValues();
         initGlobalTimerValues();
+        initTimeUnitBlocksContainers();
 
     }
 
@@ -351,26 +359,32 @@ public class WorkTimerJ {
         };
 
         mFiveMinuteTimeUnitBlock.setBackground(Color.MAGENTA);
-        mFiveMinuteTimeUnitBlock.setBounds(306, 236, TUB_WIDTH, TUB_HEIGHT);
+        mFiveMinuteTimeUnitBlock.setBounds(275, 236, TUB_WIDTH, TUB_HEIGHT);
         mFiveMinuteTimeUnitBlock.setOnTimeUnitBlockDroppedListener(onTimeUnitBlockDroppedListener);
 
         mTenMinutesTimeUnitBlock.setBackground(Color.ORANGE);
-        mTenMinutesTimeUnitBlock.setBounds(326, 236, TUB_WIDTH, TUB_HEIGHT);
+        mTenMinutesTimeUnitBlock.setBounds(299, 236, TUB_WIDTH, TUB_HEIGHT);
         mTenMinutesTimeUnitBlock.setOnTimeUnitBlockDroppedListener(onTimeUnitBlockDroppedListener);
 
         mHalfHourTimeUnitBlock.setBackground(Color.GREEN);
-        mHalfHourTimeUnitBlock.setBounds(346, 236, TUB_WIDTH, TUB_HEIGHT);
+        mHalfHourTimeUnitBlock.setBounds(323, 236, TUB_WIDTH, TUB_HEIGHT);
         mHalfHourTimeUnitBlock.setOnTimeUnitBlockDroppedListener(onTimeUnitBlockDroppedListener);
-
+        
         mOneHourTimeUnitBlock.setBackground(Color.BLUE);
         mOneHourTimeUnitBlock.setTimeTextColor(Color.WHITE);
-        mOneHourTimeUnitBlock.setBounds(366, 236, TUB_WIDTH, TUB_HEIGHT);
+        mOneHourTimeUnitBlock.setBounds(347, 236, TUB_WIDTH, TUB_HEIGHT);
         mOneHourTimeUnitBlock.setOnTimeUnitBlockDroppedListener(onTimeUnitBlockDroppedListener);
+
+        mTwoHoursTimeUnitBlock.setBackground(Color.BLACK);
+        mTwoHoursTimeUnitBlock.setTimeTextColor(Color.WHITE);
+        mTwoHoursTimeUnitBlock.setBounds(371, 236, TUB_WIDTH, TUB_HEIGHT);
+        mTwoHoursTimeUnitBlock.setOnTimeUnitBlockDroppedListener(onTimeUnitBlockDroppedListener);
 
         frame.getContentPane().add(mFiveMinuteTimeUnitBlock);
         frame.getContentPane().add(mTenMinutesTimeUnitBlock);
         frame.getContentPane().add(mHalfHourTimeUnitBlock);
         frame.getContentPane().add(mOneHourTimeUnitBlock);
+        frame.getContentPane().add(mTwoHoursTimeUnitBlock);
 
         firstTimeUnitBoxZIndex = frame.getContentPane().getComponentZOrder(mFiveMinuteTimeUnitBlock);
     }
@@ -600,8 +614,14 @@ public class WorkTimerJ {
         mSumatorDayliTimerTaskGroupContainer.setTimeUnitBlocksContainer(mDaySummatorTimeUnitBlocksContainer);
 
         initDefaultSumatrDayliTimerTaskGroupContainer();
-
         initDayliTimersValues();
+        fillTimerUnitBlockContainersWithTimeUnitBlocks();
+    }
+
+    private void fillTimerUnitBlockContainersWithTimeUnitBlocks() {
+        for(DayliTimerTaskGroup dayliTimerTaskGroup : mDayliTimerTaskGroupContainer) {
+            dayliTimerTaskGroup.updateTimeUnitBlockFromTimerValue();
+        }
     }
 
     private void initDayliTimersValues() {
@@ -865,9 +885,13 @@ public class WorkTimerJ {
     private void addHalfHourTimeUnitBlockToContainer (final TimeUnitBlocksContainer timeUnitBlocksContainer) {
         addClonedTimeUnitBlockToContainerAndDayliSumator(mHalfHourTimeUnitBlock, timeUnitBlocksContainer);
     }
-
+    
     private void addOneHourTimeUnitBlockToContainer (final TimeUnitBlocksContainer timeUnitBlocksContainer) {
         addClonedTimeUnitBlockToContainerAndDayliSumator(mOneHourTimeUnitBlock, timeUnitBlocksContainer);
+    }
+
+    private void addTwoHoursTimeUnitBlockToContainer (final TimeUnitBlocksContainer timeUnitBlocksContainer) {
+        addClonedTimeUnitBlockToContainerAndDayliSumator(mTwoHoursTimeUnitBlock, timeUnitBlocksContainer);
     }
 
     private boolean istimeUnitBlockInsideContainer(TimeUnitBlocksContainer timeUnitBlocksContainer, TimeUnitBlock timeUnitBlock) {

@@ -143,4 +143,10 @@ public class DayliTimerTaskGroup {
     public String toString() {
         return super.toString() + ", name: " + mName;
     }
+
+    public void updateTimeUnitBlockFromTimerValue() {
+        if (mTimeUnitBlocksContainer != null) {
+            mTimeUnitBlocksContainer.fillWithTimeUnitBlocksFromTime(mDayliTimer.getCounterValue());
+        }
+    }
 }

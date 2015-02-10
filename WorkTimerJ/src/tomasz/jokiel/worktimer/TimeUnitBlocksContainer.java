@@ -13,6 +13,7 @@ public class TimeUnitBlocksContainer extends Canvas {
     static final int TEN_MINUTES_IN_SECONDS        = 10 * 60;
     static final int HALF_HOUR_IN_SECONDS          = 30 * 60;
     static final int ONE_HOUR_MINUTES_IN_SECONDS   = 60 * 60;
+    static final int TWO_HOURS_MINUTES_IN_SECONDS  = 2 * 60 * 60;
 
     private ArrayList<TimeUnitBlock> mTimeUnitBlocks = new ArrayList<TimeUnitBlock>();
 
@@ -127,15 +128,20 @@ public class TimeUnitBlocksContainer extends Canvas {
 
     public void convertTimeUnitBlocksFromSmallerToBigger() {
         int sumTime = sumAllTimeUnitBlockInSeconds();
+        fillWithTimeUnitBlocksFromTime(sumTime);
+    }
 
-        int maxCountOfOneHourTimeUnitBlocks = sumTime / ONE_HOUR_MINUTES_IN_SECONDS;
+    public void fillWithTimeUnitBlocksFromTime(int sumTime) {
+        int maxCountOfTwoHoursTimeUnitBlocks = sumTime / TWO_HOURS_MINUTES_IN_SECONDS;
+        int maxCountOfOneHourTimeUnitBlocks = (sumTime % TWO_HOURS_MINUTES_IN_SECONDS) / ONE_HOUR_MINUTES_IN_SECONDS;
         int maxCountOfHalfHourTimeUnitBlocks = (sumTime % ONE_HOUR_MINUTES_IN_SECONDS) / HALF_HOUR_IN_SECONDS;
         int maxCountOfTenMinutesTimeUnitBlocks = (sumTime % HALF_HOUR_IN_SECONDS) / TEN_MINUTES_IN_SECONDS;
         int maxCountOfFiveMinutesTimeUnitBlocks = (sumTime % TEN_MINUTES_IN_SECONDS) / FIVE_MINUTES_IN_SECONDS;
 
         removeAllTimeUnitBlocks(true);
 
-        triggerRequireAddTimeUnitBlockByAmountType(maxCountOfOneHourTimeUnitBlocks,
+        triggerRequireAddTimeUnitBlockByAmountType(maxCountOfTwoHoursTimeUnitBlocks,
+                                                   maxCountOfOneHourTimeUnitBlocks,
                                                    maxCountOfHalfHourTimeUnitBlocks,
                                                    maxCountOfTenMinutesTimeUnitBlocks,
                                                    maxCountOfFiveMinutesTimeUnitBlocks);
@@ -167,10 +173,17 @@ public class TimeUnitBlocksContainer extends Canvas {
         }
     }
 
-    private void triggerRequireAddTimeUnitBlockByAmountType(int maxCountOfOneHourTimeUnitBlocks,
+    private void triggerRequireAddTimeUnitBlockByAmountType(int maxCountOfTwoHoursTimeUnitBlocks,
+                                                            int maxCountOfOneHourTimeUnitBlocks,
                                                             int maxCountOfHalfHourTimeUnitBlocks,
                                                             int maxCountOfTenMinutesTimeUnitBlocks,
                                                             int maxCountOfFiveMinutesTimeUnitBlocks) {
+        
+        for (int i = 0; i < maxCountOfTwoHoursTimeUnitBlocks; i++) {
+            if(mOnConvertAddRemoveTimeUnitBlockListener != null) {
+                mOnConvertAddRemoveTimeUnitBlockListener.onAddTwoHoursTimeUnitBlockRequested(this);
+            }
+        }
 
         for (int i = 0; i < maxCountOfOneHourTimeUnitBlocks; i++) {
             if(mOnConvertAddRemoveTimeUnitBlockListener != null) {
@@ -202,6 +215,7 @@ public class TimeUnitBlocksContainer extends Canvas {
         public void onAddTenMinutesTimeUnitBlockRequested(TimeUnitBlocksContainer timeUnitBlocksContainer);
         public void onAddHalfHourTimeUnitBlockRequested(TimeUnitBlocksContainer timeUnitBlocksContainer);
         public void onAddOneHourTimeUnitBlockRequested(TimeUnitBlocksContainer timeUnitBlocksContainer);
+        public void onAddTwoHoursTimeUnitBlockRequested(TimeUnitBlocksContainer timeUnitBlocksContainer);
         public void onAfterRemovedTimeUnitBlockFromContainer(TimeUnitBlock timeUnitBlock);
     }
 
