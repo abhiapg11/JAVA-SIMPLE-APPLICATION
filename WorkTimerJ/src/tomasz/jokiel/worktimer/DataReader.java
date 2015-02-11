@@ -84,7 +84,7 @@ public class DataReader {
                         if(DataBaseScheme.DATE_TAG_NAME.equals(nodeName)) {
                             // do date stufs
                         } else if(DataBaseScheme.DAILY_DELTA_TAG_NAME.equals(nodeName)) {
-                            // do dayl delta stuffs
+                            // do daily delta stuffs
                         } else if(DataBaseScheme.GLOBAL_DELTA_TAG_NAME.equals(nodeName)) {
                             // do global delta stuffs
                         } else if(nodeName.startsWith("TIMER_")) {  // TODO tag can have just TIMER name, then can evaluate all at once in all document
@@ -107,7 +107,6 @@ public class DataReader {
     }
 
     private static int parseTimerToSeconds(String textContent) {
-//        System.out.println("textContent= " + textContent);
         Pattern pattern = Pattern.compile("([+-]*)(\\d+):(\\d+):(\\d+)");
         Matcher matcher = pattern.matcher(textContent);
         matcher.matches();
@@ -119,8 +118,6 @@ public class DataReader {
         
         int resultInSeconds = Integer.parseInt(seconds) + (60 * Integer.parseInt(minutes)) + (60 * 60 *Integer.parseInt(hours));
 
-//        System.out.println("## "+textContent+" in seconds= "+resultInSeconds+" -> hours: " + hours + ", minutes" + minutes + ", seconds" + seconds);
-        
         if("-".equals(sign)) {
             resultInSeconds = -resultInSeconds;
         }
@@ -143,12 +140,15 @@ public class DataReader {
     private static List<String> getStringListContent(Document doc, String tagName) {
         List<String> stringListContent = new ArrayList<String>();
         Node timerDescriptionElement = doc.getElementsByTagName(tagName).item(0);
-        NodeList timerDescriptionNodes = timerDescriptionElement.getChildNodes();
-        
-        for (int i = 0; i < timerDescriptionNodes.getLength(); i++) {
-            if(!isNewLineNode(timerDescriptionNodes.item(i))) {
-                String textContent = timerDescriptionNodes.item(i).getTextContent();
-                stringListContent.add(textContent);
+
+        if(timerDescriptionElement != null) {
+            NodeList timerDescriptionNodes = timerDescriptionElement.getChildNodes();
+            
+            for (int i = 0; i < timerDescriptionNodes.getLength(); i++) {
+                if(!isNewLineNode(timerDescriptionNodes.item(i))) {
+                    String textContent = timerDescriptionNodes.item(i).getTextContent();
+                    stringListContent.add(textContent);
+                }
             }
         }
         
@@ -158,12 +158,15 @@ public class DataReader {
     private static List<Integer> getIntegerListContent(Document doc, String tagName) {
         List<Integer> stringListContent = new ArrayList<Integer>();
         Node timerCounterValueElement = doc.getElementsByTagName(tagName).item(0);
-        NodeList timerDescriptionNodes = timerCounterValueElement.getChildNodes();
 
-        for (int i = 0; i < timerDescriptionNodes.getLength(); i++) {
-            if(!isNewLineNode(timerDescriptionNodes.item(i))) {
-                int intContent = Integer.valueOf(timerDescriptionNodes.item(i).getTextContent());
-                stringListContent.add(intContent);
+        if(timerCounterValueElement != null) {
+            NodeList timerDescriptionNodes = timerCounterValueElement.getChildNodes();
+
+            for (int i = 0; i < timerDescriptionNodes.getLength(); i++) {
+                if(!isNewLineNode(timerDescriptionNodes.item(i))) {
+                    int intContent = Integer.valueOf(timerDescriptionNodes.item(i).getTextContent());
+                    stringListContent.add(intContent);
+                }
             }
         }
 
