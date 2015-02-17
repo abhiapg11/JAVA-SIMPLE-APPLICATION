@@ -9,11 +9,15 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JPanel;
 
 public class TimeUnitBlock extends JPanel {
     private static final long serialVersionUID = 5084602705848206159L;
+    private static final int MINIMAL_TIME_VALUE = 5 * 60;
 
     private final static Map<Color, Color> COLORS_MAP = new HashMap<Color, Color>(){{
         put(Color.BLACK,    Color.WHITE);
@@ -30,6 +34,7 @@ public class TimeUnitBlock extends JPanel {
     protected Point mMousePositinInsideRelWhenPressed = new Point();
     protected Point mLocationWhenPressed = new Point();
     private OnTimeUnitBlockDroppedListener mOnTimeUnitBlockDroppedListener;
+    private OnMouseDoubleClickListener mOnMouseDoubleClickListener;
     private TimeUnitBlocksContainer mTimeUnitBlocksContainerWhichInside;
     private Color mTimeTextColor = Color.BLACK;
     private TimeUnitBlock mCloneOf;
@@ -46,9 +51,13 @@ public class TimeUnitBlock extends JPanel {
     public int getValue() {
         return mTimeAnountInSeconds;
     }
-
+    
     public void setOnTimeUnitBlockDroppedListener(OnTimeUnitBlockDroppedListener listener) {
         mOnTimeUnitBlockDroppedListener = listener;
+    }
+
+    public void setOnMouseDoubleClickListener(OnMouseDoubleClickListener listener) {
+        mOnMouseDoubleClickListener = listener;
     }
 
     public void setInSideTimeUnitBlocksContainer(TimeUnitBlocksContainer timeUnitBlocksContainerWhichInside) {
@@ -98,6 +107,8 @@ public class TimeUnitBlock extends JPanel {
     };
 
     private MouseListener mouseListener = new MouseListener() {
+        private static final int MULTICLICK_INTERVAL = 500;
+        AtomicBoolean mIsAlreadyOneClick = new AtomicBoolean();
 
         @Override
         public void mouseReleased(MouseEvent e) {
@@ -126,9 +137,24 @@ public class TimeUnitBlock extends JPanel {
         @Override
         public void mouseEntered(MouseEvent e) {
         }
-        
+
         @Override
         public void mouseClicked(MouseEvent e) {
+            if (mIsAlreadyOneClick.get()) {
+                if (mOnMouseDoubleClickListener != null) {
+                    mOnMouseDoubleClickListener.onMouseDoubleClick(TimeUnitBlock.this);
+                }
+                mIsAlreadyOneClick.set(false);
+            } else {
+                mIsAlreadyOneClick.set(true);
+                new Timer("mouseDoubleClickTimer", false)
+                    .schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            mIsAlreadyOneClick.set(false);
+                        }
+                    }, MULTICLICK_INTERVAL);
+            }
         }
     };
     // *********************************************
@@ -216,7 +242,11 @@ public class TimeUnitBlock extends JPanel {
         
         return timeUnitBlockBoundsAfterMove;
     }
-    
+
+    public boolean canSplit() {
+        return mTimeAnountInSeconds > MINIMAL_TIME_VALUE;
+    }
+
     // **********************************
     public interface OnTimeUnitBlockDroppedListener {
         public void onTimeUnitBlockDropped(TimeUnitBlock timeUnitBlock);
@@ -232,8 +262,8 @@ public class TimeUnitBlock extends JPanel {
         clone.setBackground(mColorOriginal);
         clone.setBounds(getBounds());
         clone.setOnTimeUnitBlockDroppedListener(mOnTimeUnitBlockDroppedListener);
+        clone.setOnMouseDoubleClickListener(mOnMouseDoubleClickListener);
         return clone;
     }
 
-    
 }

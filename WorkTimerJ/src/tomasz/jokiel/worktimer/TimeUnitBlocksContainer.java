@@ -5,7 +5,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
-public class TimeUnitBlocksContainer extends Canvas {
+public class TimeUnitBlocksContainer extends Canvas implements OnMouseDoubleClickListener {
     private static final long serialVersionUID = -7832898888093474767L;
 
     private static final int BLOCK_INNER_MARGIN_X = 3;
@@ -22,6 +22,20 @@ public class TimeUnitBlocksContainer extends Canvas {
     private OnConvertAddRemoveTimeUnitBlockListener mOnConvertAddRemoveTimeUnitBlockListener;
     private OnAddRemoveTimeUnitBlockListener mOnAddRemoveTimeUnitBlockListener;
     
+    public interface OnConvertAddRemoveTimeUnitBlockListener {
+        public void onAddFiveMinutesTimeUnitBlockRequested(TimeUnitBlocksContainer timeUnitBlocksContainer);
+        public void onAddTenMinutesTimeUnitBlockRequested(TimeUnitBlocksContainer timeUnitBlocksContainer);
+        public void onAddHalfHourTimeUnitBlockRequested(TimeUnitBlocksContainer timeUnitBlocksContainer);
+        public void onAddOneHourTimeUnitBlockRequested(TimeUnitBlocksContainer timeUnitBlocksContainer);
+        public void onAddTwoHoursTimeUnitBlockRequested(TimeUnitBlocksContainer timeUnitBlocksContainer);
+        public void onAfterRemovedTimeUnitBlockFromContainer(TimeUnitBlock timeUnitBlock);
+    }
+
+    public interface OnAddRemoveTimeUnitBlockListener {
+        public void onAddedTimeUnitBlock(TimeUnitBlock addedTimeUnitBlock);
+        public void onRemovedTimeUnitBlock(TimeUnitBlock removedTimeUnitBlock);
+    }
+
     public void setConvertOnAddRemoveTimeUnitBlockListener(OnConvertAddRemoveTimeUnitBlockListener convertAddRemoveTimeUnitBlockListener) {
         mOnConvertAddRemoveTimeUnitBlockListener = convertAddRemoveTimeUnitBlockListener;
     }
@@ -32,6 +46,7 @@ public class TimeUnitBlocksContainer extends Canvas {
 
     public void addTimeUnitBlock(TimeUnitBlock timeUnitBlock) {
         if(!contains(timeUnitBlock)) {
+            timeUnitBlock.setOnMouseDoubleClickListener(this);
             placeInTimeUnitBlockContainer(timeUnitBlock);
             mTimeUnitBlocks.add(timeUnitBlock);
             timeUnitBlock.setInSideTimeUnitBlocksContainer(this);
@@ -68,16 +83,6 @@ public class TimeUnitBlocksContainer extends Canvas {
         return null;
     }
 
-    int sumAllTimeUnitBlockInSeconds() {
-        int sum = 0;
-
-        for (TimeUnitBlock timeUnitBlock : mTimeUnitBlocks) {
-            sum += timeUnitBlock.getValue();
-        }
-
-        return sum;
-    }
-    
     public boolean isSummable() {
         return mIsSummable;
     }
@@ -89,14 +94,6 @@ public class TimeUnitBlocksContainer extends Canvas {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "["+hashCode()+"] size: "+mTimeUnitBlocks.size()+" current value = " + sumAllTimeUnitBlockInSeconds();
-    }
-
-    protected void placeInTimeUnitBlockContainer(TimeUnitBlock timeUnitBlock) {
-        Point timeUnitBlocksNextSlootPositionRelative = getNextSlotlocation(timeUnitBlock.getWidth(), timeUnitBlock.getHeight());
-        Rectangle timeUnitBlockBoundsRelative = timeUnitBlock.getBounds();
-        timeUnitBlockBoundsRelative.x = timeUnitBlocksNextSlootPositionRelative.x;
-        timeUnitBlockBoundsRelative.y = timeUnitBlocksNextSlootPositionRelative.y;
-        timeUnitBlock.setBounds(timeUnitBlockBoundsRelative);
     }
 
     public Point getNextSlotlocation(int blockWidth, int blockHeight) {
@@ -147,6 +144,30 @@ public class TimeUnitBlocksContainer extends Canvas {
                                                    maxCountOfFiveMinutesTimeUnitBlocks);
     }
 
+    @Override
+    public void onMouseDoubleClick(TimeUnitBlock timeUnitBlock) {
+        if(isSplitPossible(timeUnitBlock)) {
+            splitTimeUnitBlockToSmallerBlocks(timeUnitBlock);
+        }
+    }
+
+    int sumAllTimeUnitBlockInSeconds() {
+        int sum = 0;
+    
+        for (TimeUnitBlock timeUnitBlock : mTimeUnitBlocks) {
+            sum += timeUnitBlock.getValue();
+        }
+    
+        return sum;
+    }
+
+    protected void placeInTimeUnitBlockContainer(TimeUnitBlock timeUnitBlock) {
+        Point timeUnitBlocksNextSlootPositionRelative = getNextSlotlocation(timeUnitBlock.getWidth(), timeUnitBlock.getHeight());
+        Rectangle timeUnitBlockBoundsRelative = timeUnitBlock.getBounds();
+        timeUnitBlockBoundsRelative.x = timeUnitBlocksNextSlootPositionRelative.x;
+        timeUnitBlockBoundsRelative.y = timeUnitBlocksNextSlootPositionRelative.y;
+        timeUnitBlock.setBounds(timeUnitBlockBoundsRelative);
+    }
 
     private void removeAllTimeUnitBlocks(boolean removeFromPane) {
         ArrayList<TimeUnitBlock> timeUnitBlocksTmp = new ArrayList<TimeUnitBlock>(mTimeUnitBlocks);
@@ -159,15 +180,16 @@ public class TimeUnitBlocksContainer extends Canvas {
         if(timeUnitBlock != null) {
             mTimeUnitBlocks.remove(timeUnitBlock);
             timeUnitBlock.setInSideTimeUnitBlocksContainer(null);
+            timeUnitBlock.setOnMouseDoubleClickListener(null);
     
             if(removeFromPane) {
                 if(mOnConvertAddRemoveTimeUnitBlockListener != null) {
                     mOnConvertAddRemoveTimeUnitBlockListener.onAfterRemovedTimeUnitBlockFromContainer(timeUnitBlock);
                 }
-            } else {
-                if(mOnAddRemoveTimeUnitBlockListener != null) {
-                    mOnAddRemoveTimeUnitBlockListener.onRemovedTimeUnitBlock(timeUnitBlock);
-                }
+            }
+
+            if(mOnAddRemoveTimeUnitBlockListener != null) {
+                mOnAddRemoveTimeUnitBlockListener.onRemovedTimeUnitBlock(timeUnitBlock);
             }
             
         }
@@ -210,17 +232,35 @@ public class TimeUnitBlocksContainer extends Canvas {
         }
     }
     
-    public interface OnConvertAddRemoveTimeUnitBlockListener {
-        public void onAddFiveMinutesTimeUnitBlockRequested(TimeUnitBlocksContainer timeUnitBlocksContainer);
-        public void onAddTenMinutesTimeUnitBlockRequested(TimeUnitBlocksContainer timeUnitBlocksContainer);
-        public void onAddHalfHourTimeUnitBlockRequested(TimeUnitBlocksContainer timeUnitBlocksContainer);
-        public void onAddOneHourTimeUnitBlockRequested(TimeUnitBlocksContainer timeUnitBlocksContainer);
-        public void onAddTwoHoursTimeUnitBlockRequested(TimeUnitBlocksContainer timeUnitBlocksContainer);
-        public void onAfterRemovedTimeUnitBlockFromContainer(TimeUnitBlock timeUnitBlock);
+    private boolean isSplitPossible(TimeUnitBlock timeUnitBlock) {
+        return timeUnitBlock != null && timeUnitBlock.canSplit() && isSummable();
     }
 
-    public interface OnAddRemoveTimeUnitBlockListener {
-        public void onAddedTimeUnitBlock(TimeUnitBlock addedTimeUnitBlock);
-        public void onRemovedTimeUnitBlock(TimeUnitBlock removedTimeUnitBlock);
+    private void splitTimeUnitBlockToSmallerBlocks(TimeUnitBlock timeUnitBlock) {
+
+        switch(timeUnitBlock.getValue()) {
+            case TWO_HOURS_MINUTES_IN_SECONDS:
+                mOnConvertAddRemoveTimeUnitBlockListener.onAddOneHourTimeUnitBlockRequested(this);
+                mOnConvertAddRemoveTimeUnitBlockListener.onAddOneHourTimeUnitBlockRequested(this);
+                break;
+            case ONE_HOUR_MINUTES_IN_SECONDS:
+                mOnConvertAddRemoveTimeUnitBlockListener.onAddHalfHourTimeUnitBlockRequested(this);
+                mOnConvertAddRemoveTimeUnitBlockListener.onAddHalfHourTimeUnitBlockRequested(this);
+                break;
+            case HALF_HOUR_IN_SECONDS:
+                mOnConvertAddRemoveTimeUnitBlockListener.onAddTenMinutesTimeUnitBlockRequested(this);
+                mOnConvertAddRemoveTimeUnitBlockListener.onAddTenMinutesTimeUnitBlockRequested(this);
+                mOnConvertAddRemoveTimeUnitBlockListener.onAddTenMinutesTimeUnitBlockRequested(this);
+                break;
+            case TEN_MINUTES_IN_SECONDS:
+                mOnConvertAddRemoveTimeUnitBlockListener.onAddFiveMinutesTimeUnitBlockRequested(this);
+                mOnConvertAddRemoveTimeUnitBlockListener.onAddFiveMinutesTimeUnitBlockRequested(this);
+                break;
+        }
+
+        removeTimeUnitBlock(timeUnitBlock, true);
+        reorderTimeUnitBlocks();
     }
+
+
 }

@@ -185,6 +185,7 @@ public class WorkTimerJ {
      */
     private void initialize() {
         frame = new JFrame();
+        frame.setTitle(ApplicationInfo.getApplicationHeader());
         frame.setResizable(false);
         frame.setBounds(100, 100, 640, 312);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

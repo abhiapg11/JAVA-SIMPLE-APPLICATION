@@ -13,6 +13,7 @@ public class TimeUnitBlocksContainerTest {
     private final TimeUnitBlock mTenMinutesTimeUnitBlock  = new TimeUnitBlock(TimeUnitBlocksContainer.TEN_MINUTES_IN_SECONDS);
     private final TimeUnitBlock mHalfHourTimeUnitBlock    = new TimeUnitBlock(TimeUnitBlocksContainer.HALF_HOUR_IN_SECONDS);
     private final TimeUnitBlock mOneHourTimeUnitBlock     = new TimeUnitBlock(TimeUnitBlocksContainer.ONE_HOUR_MINUTES_IN_SECONDS);
+    private final TimeUnitBlock mTwoHoursTimeUnitBlock     = new TimeUnitBlock(TimeUnitBlocksContainer.TWO_HOURS_MINUTES_IN_SECONDS);
 
     TimeUnitBlocksContainer mTimeUnitBlocksContainer;
     private OnConvertAddRemoveTimeUnitBlockListener mAddRemoveTimeUnitBlockListener = new OnConvertAddRemoveTimeUnitBlockListener() {
@@ -38,6 +39,12 @@ public class TimeUnitBlocksContainerTest {
         @Override
         public void onAddOneHourTimeUnitBlockRequested(TimeUnitBlocksContainer timeUnitBlocksContainer) {
             mTimeUnitBlocksContainer.addTimeUnitBlock(mOneHourTimeUnitBlock.clone());
+        }
+
+        @Override
+        public void onAddTwoHoursTimeUnitBlockRequested(
+                TimeUnitBlocksContainer timeUnitBlocksContainer) {
+            mTimeUnitBlocksContainer.addTimeUnitBlock(mTwoHoursTimeUnitBlock.clone());
         }
     };
 
@@ -111,10 +118,12 @@ public class TimeUnitBlocksContainerTest {
         mTimeUnitBlocksContainer.addTimeUnitBlock(mTenMinutesTimeUnitBlock);
         mTimeUnitBlocksContainer.addTimeUnitBlock(mHalfHourTimeUnitBlock);
         mTimeUnitBlocksContainer.addTimeUnitBlock(mOneHourTimeUnitBlock);
+        mTimeUnitBlocksContainer.addTimeUnitBlock(mTwoHoursTimeUnitBlock);
 
         // then
         assertEquals(mFiveMinuteTimeUnitBlock.getValue() + mTenMinutesTimeUnitBlock.getValue() 
-                    + mHalfHourTimeUnitBlock.getValue() + mOneHourTimeUnitBlock.getValue(), 
+                    + mHalfHourTimeUnitBlock.getValue() + mOneHourTimeUnitBlock.getValue()
+                    + mTwoHoursTimeUnitBlock.getValue(), 
                          mTimeUnitBlocksContainer.sumAllTimeUnitBlockInSeconds());
     }
 
@@ -128,12 +137,14 @@ public class TimeUnitBlocksContainerTest {
         mTimeUnitBlocksContainer.addTimeUnitBlock(timeUnitBloctToTestRemove);
         mTimeUnitBlocksContainer.addTimeUnitBlock(mHalfHourTimeUnitBlock);
         mTimeUnitBlocksContainer.addTimeUnitBlock(mOneHourTimeUnitBlock);
+        mTimeUnitBlocksContainer.addTimeUnitBlock(mTwoHoursTimeUnitBlock);
 
         mTimeUnitBlocksContainer.removeTimeUnitBlock(timeUnitBloctToTestRemove);
 
         // then
         assertFalse(mTimeUnitBlocksContainer.contains(timeUnitBloctToTestRemove));
-        assertEquals(mFiveMinuteTimeUnitBlock.getValue() + mHalfHourTimeUnitBlock.getValue() + mOneHourTimeUnitBlock.getValue(), 
+        assertEquals(mFiveMinuteTimeUnitBlock.getValue() + mHalfHourTimeUnitBlock.getValue() + mOneHourTimeUnitBlock.getValue()
+                     + mTwoHoursTimeUnitBlock.getValue(), 
                     mTimeUnitBlocksContainer.sumAllTimeUnitBlockInSeconds());
     }
 
@@ -163,6 +174,7 @@ public class TimeUnitBlocksContainerTest {
         mTimeUnitBlocksContainer.addTimeUnitBlock(mTenMinutesTimeUnitBlock);
         mTimeUnitBlocksContainer.addTimeUnitBlock(mHalfHourTimeUnitBlock);
         mTimeUnitBlocksContainer.addTimeUnitBlock(mOneHourTimeUnitBlock);
+        mTimeUnitBlocksContainer.addTimeUnitBlock(mTwoHoursTimeUnitBlock);
 
         mTimeUnitBlocksContainer.reorderTimeUnitBlocks();
 
@@ -171,25 +183,137 @@ public class TimeUnitBlocksContainerTest {
         assertTrue(mTimeUnitBlocksContainer.contains(mTenMinutesTimeUnitBlock));
         assertTrue(mTimeUnitBlocksContainer.contains(mHalfHourTimeUnitBlock));
         assertTrue(mTimeUnitBlocksContainer.contains(mOneHourTimeUnitBlock));
+        assertTrue(mTimeUnitBlocksContainer.contains(mTwoHoursTimeUnitBlock));
     }
-
+    
     @Test
     public void testRemoveAllUnitBlock() {
         // given
-
+        
         // when
         mTimeUnitBlocksContainer.addTimeUnitBlock(mFiveMinuteTimeUnitBlock);
         mTimeUnitBlocksContainer.addTimeUnitBlock(mTenMinutesTimeUnitBlock);
         mTimeUnitBlocksContainer.addTimeUnitBlock(mHalfHourTimeUnitBlock);
         mTimeUnitBlocksContainer.addTimeUnitBlock(mOneHourTimeUnitBlock);
-
+        mTimeUnitBlocksContainer.addTimeUnitBlock(mTwoHoursTimeUnitBlock);
+        
         mTimeUnitBlocksContainer.removeAllTimeUnitBlocks();
-
+        
         // then
         assertFalse(mTimeUnitBlocksContainer.contains(mFiveMinuteTimeUnitBlock));
         assertFalse(mTimeUnitBlocksContainer.contains(mTenMinutesTimeUnitBlock));
         assertFalse(mTimeUnitBlocksContainer.contains(mHalfHourTimeUnitBlock));
         assertFalse(mTimeUnitBlocksContainer.contains(mOneHourTimeUnitBlock));
+        assertFalse(mTimeUnitBlocksContainer.contains(mTwoHoursTimeUnitBlock));
         assertEquals(0, mTimeUnitBlocksContainer.sumAllTimeUnitBlockInSeconds());
+    }
+    
+    @Test
+    public void testSplitTwoHoursTimeUnitBlock() {
+        // given
+        mTimeUnitBlocksContainer.setConvertOnAddRemoveTimeUnitBlockListener(mAddRemoveTimeUnitBlockListener);
+        
+        // when
+        mTimeUnitBlocksContainer.addTimeUnitBlock(mTwoHoursTimeUnitBlock);
+        
+        mTimeUnitBlocksContainer.onMouseDoubleClick(mTwoHoursTimeUnitBlock);
+        
+        // then
+        assertFalse(mTimeUnitBlocksContainer.contains(mTwoHoursTimeUnitBlock));
+        assertEquals(mTwoHoursTimeUnitBlock.getValue(), mTimeUnitBlocksContainer.sumAllTimeUnitBlockInSeconds());
+    }
+    
+    @Test
+    public void testSplitOneHourTimeUnitBlock() {
+        // given
+        mTimeUnitBlocksContainer.setConvertOnAddRemoveTimeUnitBlockListener(mAddRemoveTimeUnitBlockListener);
+        
+        // when
+        mTimeUnitBlocksContainer.addTimeUnitBlock(mOneHourTimeUnitBlock);
+        
+        mTimeUnitBlocksContainer.onMouseDoubleClick(mOneHourTimeUnitBlock);
+        
+        // then
+        assertFalse(mTimeUnitBlocksContainer.contains(mOneHourTimeUnitBlock));
+        assertEquals(mOneHourTimeUnitBlock.getValue(), mTimeUnitBlocksContainer.sumAllTimeUnitBlockInSeconds());
+    }
+    
+    @Test
+    public void testSplitHalfHourTimeUnitBlock() {
+        // given
+        mTimeUnitBlocksContainer.setConvertOnAddRemoveTimeUnitBlockListener(mAddRemoveTimeUnitBlockListener);
+        
+        // when
+        mTimeUnitBlocksContainer.addTimeUnitBlock(mHalfHourTimeUnitBlock);
+        
+        mTimeUnitBlocksContainer.onMouseDoubleClick(mHalfHourTimeUnitBlock);
+        
+        // then
+        assertFalse(mTimeUnitBlocksContainer.contains(mHalfHourTimeUnitBlock));
+        assertEquals(mHalfHourTimeUnitBlock.getValue(), mTimeUnitBlocksContainer.sumAllTimeUnitBlockInSeconds());
+    }
+
+    @Test
+    public void testSplitTenMinutesTimeUnitBlock() {
+        // given
+        mTimeUnitBlocksContainer.setConvertOnAddRemoveTimeUnitBlockListener(mAddRemoveTimeUnitBlockListener);
+        
+        // when
+        mTimeUnitBlocksContainer.addTimeUnitBlock(mTenMinutesTimeUnitBlock);
+        
+        mTimeUnitBlocksContainer.onMouseDoubleClick(mTenMinutesTimeUnitBlock);
+        
+        // then
+        assertFalse(mTimeUnitBlocksContainer.contains(mTenMinutesTimeUnitBlock));
+        assertEquals(mTenMinutesTimeUnitBlock.getValue(), mTimeUnitBlocksContainer.sumAllTimeUnitBlockInSeconds());
+    }
+
+    @Test
+    public void testNotSplitTenMinutesTimeUnitBlockWhenCointainerNotSummable() {
+        // given
+        mTimeUnitBlocksContainer.setConvertOnAddRemoveTimeUnitBlockListener(mAddRemoveTimeUnitBlockListener);
+        mTimeUnitBlocksContainer.setSummable(false);
+        
+        // when
+        mTimeUnitBlocksContainer.addTimeUnitBlock(mTenMinutesTimeUnitBlock);
+        
+        mTimeUnitBlocksContainer.onMouseDoubleClick(mTenMinutesTimeUnitBlock);
+        
+        // then
+        assertTrue(mTimeUnitBlocksContainer.contains(mTenMinutesTimeUnitBlock));
+        assertEquals(mTenMinutesTimeUnitBlock.getValue(), mTimeUnitBlocksContainer.sumAllTimeUnitBlockInSeconds());
+    }
+
+    @Test
+    public void testNotSplitFiveMinutesTimeUnitBlock() {
+        // given
+        mTimeUnitBlocksContainer.setConvertOnAddRemoveTimeUnitBlockListener(mAddRemoveTimeUnitBlockListener);
+        
+        // when
+        mTimeUnitBlocksContainer.addTimeUnitBlock(mFiveMinuteTimeUnitBlock);
+        
+        mTimeUnitBlocksContainer.onMouseDoubleClick(mFiveMinuteTimeUnitBlock);
+        
+        // then
+        assertTrue(mTimeUnitBlocksContainer.contains(mFiveMinuteTimeUnitBlock));
+        assertEquals(mFiveMinuteTimeUnitBlock.getValue(), mTimeUnitBlocksContainer.sumAllTimeUnitBlockInSeconds());
+    }
+
+    @Test
+    public void testFillWithTimeUnitBlocksFromTime() {
+        // given
+        mTimeUnitBlocksContainer.setConvertOnAddRemoveTimeUnitBlockListener(mAddRemoveTimeUnitBlockListener);
+
+        // when
+        final int timeSum = mFiveMinuteTimeUnitBlock.getValue()
+                + mTenMinutesTimeUnitBlock.getValue()
+                + mHalfHourTimeUnitBlock.getValue()
+                + mOneHourTimeUnitBlock.getValue()
+                + mTwoHoursTimeUnitBlock.getValue();
+
+        mTimeUnitBlocksContainer.fillWithTimeUnitBlocksFromTime(timeSum);
+
+        // then
+        assertEquals(timeSum, mTimeUnitBlocksContainer.sumAllTimeUnitBlockInSeconds());
     }
 }

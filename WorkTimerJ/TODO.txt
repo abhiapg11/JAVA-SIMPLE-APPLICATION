@@ -1,14 +1,12 @@
+- otoczka podœwietlaj¹ca element albo zrobenie go przeŸroczystym trochê, gdy mo¿na go upuœciæ na dany TUB-C, czerwona otoczka gdy nad œmietnikiem lub gdy TUB po raz pierwszy i jeszcze nigdzie nie wrzucony
 - dodaæ wypluwanie pliku stylów XMLa z resourców
+- automatyczny podzia³ bazy danych na pliki miesiêcy
+- specjalny TUB-C na TUBy nadgodzinowe i niedogodzinowe, które bêd¹ uzupe³niane w przypadku zakoñczenia dnia tym co siê uzbiera³o?
 - baza danych XML, w niej te¿ bêdzie zapisywana lub liczona delta ca³kowita
 - timery jak w "WorkTimer", pozosta³a global delta - liczona z XMLa
-- automatyczny podzia³ bazy danych na pliki miesiêcy
-- otoczka podœwietlaj¹ca element albo zrobenie go przeŸroczystym trochê, gdy mo¿na go upuœciæ na dany TUB-C, czerwona otoczka gdy nad œmietnikiem lub gdy TUB po raz pierwszy i jeszcze nigdzie nie wrzucony
-- podwójny klik w miejscu myszk¹ na TUB gdy jest w kontenerze powoduje jego rozbiecie na 2-3 mniejsze/sk³adowe TUBy
-- specjalny TUB-C na TUBy nadgodzinowe i niedogodzinowe, które bêd¹ uzupe³niane w przypadku zakoñczenia dnia tym co siê uzbiera³o?
-- TUBC pamiêtaj¹ ostatnie wartoœci liczników
 
 TODO BUGS
+- ikonka kosza przy poszczególnym timerze kasuje tylko zawartoœæ TUB-C a nie czas licznika
 !?- Po manualnym ususniêciu TUBow z sumatora, przy updejcie convercie dodaniu blocza 5 min, powracaj¹ (nowe) do (pustego) sumatora 
-- ikonka koszza przy poszczególnym timerze kasuje tylko zawartoœæ TUB-C a nie czas licznika
-- TUB przerzucony z timera do kosza i z powrotem nir dodaje z powrotem tego czasu (CZASAMI?)
-- Gdy siê TUB przenosi podczas atomatycznego dodawania TUBa 5 minutowego, to usieka spod myszki, by dokonaæ konwersji
+- TUB przerzucony z timera do kosza i z powrotem nie dodaje z powrotem tego czasu (CZASAMI?)
+- Gdy siê TUB przenosi podczas atomatycznego dodawania TUBa 5 minutowego, to ucieka spod myszki, by dokonaæ konwersji
