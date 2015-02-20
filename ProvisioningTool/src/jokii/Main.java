@@ -39,6 +39,8 @@ public class Main {
     private JComboBox<String>   mHistoryComboBox;
     private JTextField          mDescriptionTextField;
     private JButton             mBtnSave;
+    private JTextField 			mAdbPathTextField;
+    private JButton 			mCheckAdbBtn;
 
     private ProvisioningData    mStorageData;
     private XStream             mXstream                = new XStream();
@@ -182,6 +184,21 @@ public class Main {
         button.addActionListener(mAboutActionListener);
         button.setBounds(696, 378, 16, 23);
         mFrame.getContentPane().add(button);
+        
+        JLabel lblAdbPath = new JLabel("ADB path");
+        lblAdbPath.setBounds(10, 332, 46, 14);
+        mFrame.getContentPane().add(lblAdbPath);
+        
+        mAdbPathTextField = new JTextField();
+        mAdbPathTextField.setToolTipText("Can be empty if ADB on system PATH");
+        mAdbPathTextField.setBounds(84, 325, 519, 20);
+        mFrame.getContentPane().add(mAdbPathTextField);
+        mAdbPathTextField.setColumns(10);
+        
+        mCheckAdbBtn = new JButton("Check");
+        mCheckAdbBtn.setBounds(613, 325, 89, 23);
+        mCheckAdbBtn.addActionListener(mCheckAdbActionListener);
+        mFrame.getContentPane().add(mCheckAdbBtn);
         
 
         if(mStorageData != null && !mStorageData.getList().isEmpty()) {
@@ -347,10 +364,59 @@ public class Main {
 
 
     private void executeProvision(final String email, final String otaPin) throws IOException {
+    	
+    	String customAdbPath = mAdbPathTextField.getText().trim();
+    	final String adbPath = customAdbPath.isEmpty() ? "adb" : customAdbPath;
+    	
+    	// define a SwingWorker to run in background  
+    	SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>()  
+    			{  
+    		private void runCommandAndPrintOutput(String command) throws IOException {
+    			StringBuilder sb = new StringBuilder();
+    			String printline;
+    			
+    			Process process = Runtime.getRuntime().exec(command);
+    			BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+    			
+    			while ((printline = input.readLine()) != null) {
+    				System.out.println(printline);
+    				sb.append(printline).append("\n");
+    				mConsoleOutputJTextPane.setText(sb.toString());
+    			}
+    			input.close(); 
+    		}
+    		
+    		public Void doInBackground() throws IOException, InterruptedException  
+    		{  
+    			runCommandAndPrintOutput(adbPath +" shell input text " + email);
+    			runCommandAndPrintOutput(adbPath +" shell input keyevent 66");
+    			
+    			String[] otaPinArray = otaPin.split("-");
+    			runCommandAndPrintOutput(adbPath +" shell input text " + otaPinArray[0]);
+    			Thread.sleep(1000);
+    			runCommandAndPrintOutput(adbPath +" shell input text " + otaPinArray[1]);
+    			Thread.sleep(1000);
+    			runCommandAndPrintOutput(adbPath +" shell input text " + otaPinArray[2]);
+    			Thread.sleep(500);
+    			
+    			runCommandAndPrintOutput(adbPath +" shell input keyevent 66");
+    			
+    			return null;  
+    		}  
+    			};  
+    			
+    			// execute the background thread  
+    			worker.execute();
+    }
+
+    private void checkAdbPath() {
+
+    	String customAdbPath = mAdbPathTextField.getText().trim();
+    	final String adbPath = customAdbPath.isEmpty() ? "adb" : customAdbPath;
 
         // define a SwingWorker to run in background  
-        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>()  
-                {  
+        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+
             private void runCommandAndPrintOutput(String command) throws IOException {
                 StringBuilder sb = new StringBuilder();
                 String printline;
@@ -366,38 +432,31 @@ public class Main {
                 input.close(); 
             }
 
-            public Void doInBackground() throws IOException, InterruptedException  
-            {  
-                runCommandAndPrintOutput("adb shell input text " + email);
-                runCommandAndPrintOutput("adb shell input keyevent 66");
-
-                String[] otaPinArray = otaPin.split("-");
-                runCommandAndPrintOutput("adb shell input text " + otaPinArray[0]);
-                Thread.sleep(1000);
-                runCommandAndPrintOutput("adb shell input text " + otaPinArray[1]);
-                Thread.sleep(1000);
-                runCommandAndPrintOutput("adb shell input text " + otaPinArray[2]);
-                Thread.sleep(500);
-
-                runCommandAndPrintOutput("adb shell input keyevent 66");
-
+            public Void doInBackground() throws IOException, InterruptedException {  
+                runCommandAndPrintOutput(adbPath + " devices");
                 return null;  
             }  
-                };  
+        };  
 
                 // execute the background thread  
                 worker.execute();
     }
 
-
+    
     private ActionListener mSaveActionListener = new ActionListener() {
+    	
+    	public void actionPerformed(ActionEvent e) {
+    		prepareInputTexts();
+    		
+    		if(trySaveCurrent()) {
+    			showMessageDialog("Saved");
+    		}
+    	}
+    };
 
+    private ActionListener mCheckAdbActionListener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-            prepareInputTexts();
-
-            if(trySaveCurrent()) {
-                showMessageDialog("Saved");
-            }
+        	checkAdbPath();
         }
     };
 
@@ -583,7 +642,6 @@ public class Main {
             }
         }
     };
-
 
 //    private String readFileContent(String filePath) throws IOException {
 //        String fileContentString = "";
