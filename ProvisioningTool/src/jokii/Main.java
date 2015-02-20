@@ -8,19 +8,13 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
-import javax.swing.SwingWorker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,6 +23,8 @@ import javax.swing.JComboBox;
 import com.thoughtworks.xstream.XStream;
 import java.awt.event.ActionListener;
 import java.awt.Color;
+
+import jokii.BackgroundConsoleWorker.BackgroundConsoleWorkerExecutor;
 
 public class Main {
 
@@ -39,8 +35,8 @@ public class Main {
     private JComboBox<String>   mHistoryComboBox;
     private JTextField          mDescriptionTextField;
     private JButton             mBtnSave;
-    private JTextField 			mAdbPathTextField;
-    private JButton 			mCheckAdbBtn;
+    private JTextField          mAdbPathTextField;
+    private JButton             mCheckAdbBtn;
 
     private ProvisioningData    mStorageData;
     private XStream             mXstream                = new XStream();
@@ -72,23 +68,12 @@ public class Main {
     }
 
 
-    private void readData() {
-        try {
-            mStorageData = (ProvisioningData)mXstream.fromXML(new FileInputStream(ProjectConst.DATA_FILE_NAME));
-        } catch (FileNotFoundException e) {
-            System.out.println("No data to load - " + ProjectConst.DATA_FILE_NAME + "doesn't exist in current path.");
-        } catch (Exception e) {
-            System.out.println("Error on start application: " + e.toString());
-        }
-    }
-
-
     /**
      * Initialize the contents of the frame.
      */
     private void initialize() {
-        readData();
-
+        mStorageData = StorageUtils.readStorageData();
+        ConfigItem configData = StorageUtils.readConfigData();
 
         mFrame = new JFrame();
         mFrame.getContentPane().setBackground(Color.RED);
@@ -184,19 +169,21 @@ public class Main {
         button.addActionListener(mAboutActionListener);
         button.setBounds(696, 378, 16, 23);
         mFrame.getContentPane().add(button);
-        
+
         JLabel lblAdbPath = new JLabel("ADB path");
-        lblAdbPath.setBounds(10, 332, 46, 14);
+        lblAdbPath.setBounds(10, 329, 77, 14);
         mFrame.getContentPane().add(lblAdbPath);
-        
+
         mAdbPathTextField = new JTextField();
         mAdbPathTextField.setToolTipText("Can be empty if ADB on system PATH");
-        mAdbPathTextField.setBounds(84, 325, 519, 20);
-        mFrame.getContentPane().add(mAdbPathTextField);
+        mAdbPathTextField.setBounds(71, 325, 508, 20);
         mAdbPathTextField.setColumns(10);
+        String configuredAdbPath = (configData != null) ? configData.getAdbPath() : "";
+        mAdbPathTextField.setText(configuredAdbPath);
+        mFrame.getContentPane().add(mAdbPathTextField);
         
-        mCheckAdbBtn = new JButton("Check");
-        mCheckAdbBtn.setBounds(613, 325, 89, 23);
+        mCheckAdbBtn = new JButton("Update/Check");
+        mCheckAdbBtn.setBounds(589, 325, 113, 21);
         mCheckAdbBtn.addActionListener(mCheckAdbActionListener);
         mFrame.getContentPane().add(mCheckAdbBtn);
         
@@ -226,14 +213,147 @@ public class Main {
     };
 
 
-    protected void fillDisplayFields(String email, String otaPin, String description) {
+    private ActionListener mProvisionActionListener = new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            prepareInputTexts();
+            try {
+                String email  = mEmailTextField.getText();
+                String otaPin = mOtaPinTextField.getText();
+    
+                if(validateProvisioningData(email, otaPin)) {
+                    executeProvision(email, otaPin);
+                }
+    
+            } catch (Exception error) {
+                error.printStackTrace();
+            }
+        }
+    };
+
+
+    private ActionListener mExitActionListener = new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            System.exit(0);
+        }
+    };
+    private ActionListener mAboutActionListener = new ActionListener() {
+        public void actionPerformed(ActionEvent arg0) {
+            showAboutDialog();
+        }
+    };
+
+
+    private ActionListener mSaveActionListener = new ActionListener() {
+    
+        public void actionPerformed(ActionEvent e) {
+            prepareInputTexts();
+    
+            if(trySaveCurrent()) {
+                showMessageDialog("Saved");
+            }
+        }
+    };
+    private ActionListener mCheckAdbActionListener = new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            updateAdbPath();
+            checkAdbPath();
+        }
+
+        private void updateAdbPath() {
+            ConfigItem configItem = new ConfigItem();
+            configItem.setAdbPath(getAdbCommand());
+            StorageUtils.updateConfigData(configItem);
+        }
+    };
+    private ActionListener mRemoveActionListener = new ActionListener() {
+        public void actionPerformed(ActionEvent arg0) {
+            int currentItem = mHistoryComboBox.getSelectedIndex();
+    
+            if(currentItem != -1) {
+                String itemDescription = mStorageData.getList().get(currentItem).description;
+                boolean result = showConfirmDialog("Are you sure you want to remove\n\n\"" + itemDescription + "\"\n\n");
+    
+                if(result) {
+                    mHistoryComboBox.removeItemAt(currentItem);
+    
+                    mStorageData.getList().remove(currentItem);
+    
+                    FileOutputStream fos = null;
+                    try {
+                        fos = new FileOutputStream(ProjectConst.DATA_FILE_NAME);
+                        mXstream.toXML(mStorageData, fos);
+                    } catch (FileNotFoundException e1) {
+                        e1.printStackTrace();
+                        showErrorDialog("Storage access denny");
+                    } finally {
+                        try {
+                            if(fos != null) {
+                                fos.close();
+                            }
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+    
+                    fillInitialDisplayFields();
+                }
+            }
+        }
+    };
+    private ActionListener mReplaceActionListener = new ActionListener() {
+    
+        public void actionPerformed(ActionEvent arg0) {
+            int currentItem = mHistoryComboBox.getSelectedIndex();
+            prepareInputTexts();
+    
+            if(currentItem != -1) {
+    
+                if(validateFields()) {
+    
+                    if(isCurrentItemAlreadyExist()) {
+                        showErrorDialog("Entry already exist");
+                    } else {
+                        String itemDescription = mStorageData.getList().get(currentItem).description;
+                        boolean result = showConfirmDialog("Are you sure you want to replace with\n\n\"" + itemDescription + "\"\n\n");
+    
+                        if(result && trySaveCurrent()) {
+                            mHistoryComboBox.removeItemAt(currentItem);
+    
+                            mStorageData.getList().remove(currentItem);
+    
+                            FileOutputStream fos = null;
+                            try {
+                                fos = new FileOutputStream(ProjectConst.DATA_FILE_NAME);
+                                mXstream.toXML(mStorageData, fos);
+                            } catch (FileNotFoundException e1) {
+                                e1.printStackTrace();
+                                showErrorDialog("Storage access denny");
+                            } finally {
+                                try {
+                                    if(fos != null) {
+                                        fos.close();
+                                    }
+                                } catch (IOException e1) {
+                                    e1.printStackTrace();
+                                }
+                            }
+                            setLastItemSelected();
+                        }
+                    }
+    
+                }
+            }
+        }
+    };
+
+    private void fillDisplayFields(String email, String otaPin, String description) {
         mEmailTextField.setText(email);
         mOtaPinTextField.setText(otaPin);
         mDescriptionTextField.setText(description);
     }
 
 
-    protected void fillInitialDisplayFields() {
+    private void fillInitialDisplayFields() {
         if(mStorageData != null && !mStorageData.getList().isEmpty()) {
             mHistoryComboBox.setSelectedIndex(0);
             ProvisioningItem firstElement = mStorageData.getList().get(0);
@@ -253,24 +373,6 @@ public class Main {
             }
         }
     }
-
-
-    private ActionListener mProvisionActionListener = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            prepareInputTexts();
-            try {
-                String email  = mEmailTextField.getText();
-                String otaPin = mOtaPinTextField.getText();
-
-                if(validateProvisioningData(email, otaPin)) {
-                    executeProvision(email, otaPin);
-                }
-
-            } catch (Exception error) {
-                error.printStackTrace();
-            }
-        }
-    };
 
 
     private void showInfoDialog(String title, String body) {
@@ -298,7 +400,7 @@ public class Main {
         options[OK_OPTION]);    //default button title
         
         if(selectedOption == XSTREAM_LICENSE_OPTION) {
-            showInfoDialog("XStream license", readFileContentFromResource(ProjectConst.XSTREAM_LICENSE_FILE_NAME));
+            showInfoDialog("XStream license", FileUtils.readFileContentFromResource(ProjectConst.XSTREAM_LICENSE_FILE_NAME));
         }
     }
 
@@ -320,145 +422,50 @@ public class Main {
     }
 
 
-    private ActionListener mExitActionListener = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            System.exit(0);
-        }
-    };
-
-
-    private ActionListener mAboutActionListener = new ActionListener() {
-        public void actionPerformed(ActionEvent arg0) {
-            showAboutDialog();
-//            showInfoDialog("Application info",  "Author: Tomasz Jokiel\n" +
-//                    "version: " + ProjectConst.APP_VERSION);
-        }
-    };
-
-    //	private void executeCommand(final String command) throws IOException {
-    //		
-    //		// define a SwingWorker to run in background  
-    //		SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>()  
-    //				{  
-    //			public Void doInBackground() throws IOException  
-    //			{  
-    //				StringBuilder sb = new StringBuilder();
-    //				String printline;
-    //				Process process = Runtime.getRuntime().exec(command);
-    //				
-    //				BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-    //				
-    //				while ((printline = input.readLine()) != null) {
-    //					System.out.println(printline);
-    //					sb.append(printline).append("\n");
-    //					mConsoleOutputJTextPane.setText(sb.toString());
-    //				}
-    //				input.close(); 
-    //				return null;  
-    //			}  
-    //				};  
-    //				
-    //				// execute the background thread  
-    //				worker.execute();
-    //	}
-
-
     private void executeProvision(final String email, final String otaPin) throws IOException {
-    	
-    	String customAdbPath = mAdbPathTextField.getText().trim();
-    	final String adbPath = customAdbPath.isEmpty() ? "adb" : customAdbPath;
-    	
-    	// define a SwingWorker to run in background  
-    	SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>()  
-    			{  
-    		private void runCommandAndPrintOutput(String command) throws IOException {
-    			StringBuilder sb = new StringBuilder();
-    			String printline;
-    			
-    			Process process = Runtime.getRuntime().exec(command);
-    			BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-    			
-    			while ((printline = input.readLine()) != null) {
-    				System.out.println(printline);
-    				sb.append(printline).append("\n");
-    				mConsoleOutputJTextPane.setText(sb.toString());
-    			}
-    			input.close(); 
-    		}
-    		
-    		public Void doInBackground() throws IOException, InterruptedException  
-    		{  
-    			runCommandAndPrintOutput(adbPath +" shell input text " + email);
-    			runCommandAndPrintOutput(adbPath +" shell input keyevent 66");
-    			
-    			String[] otaPinArray = otaPin.split("-");
-    			runCommandAndPrintOutput(adbPath +" shell input text " + otaPinArray[0]);
-    			Thread.sleep(1000);
-    			runCommandAndPrintOutput(adbPath +" shell input text " + otaPinArray[1]);
-    			Thread.sleep(1000);
-    			runCommandAndPrintOutput(adbPath +" shell input text " + otaPinArray[2]);
-    			Thread.sleep(500);
-    			
-    			runCommandAndPrintOutput(adbPath +" shell input keyevent 66");
-    			
-    			return null;  
-    		}  
-    			};  
-    			
-    			// execute the background thread  
-    			worker.execute();
+
+        final String adbPath = getAdbCommand();
+
+        new BackgroundConsoleWorker(new BackgroundConsoleWorkerExecutorLinePrinter() {
+            @Override
+            public void doInBackground(BackgroundConsoleWorker backgroundConsoleWorker) {
+                try {
+                    backgroundConsoleWorker.runConsoleCommand(adbPath + " shell input text " + email);
+                    backgroundConsoleWorker.runConsoleCommand(adbPath + " shell input keyevent 66");
+
+                    String[] otaPinArray = otaPin.split("-");
+                    backgroundConsoleWorker.runConsoleCommand(adbPath + " shell input text " + otaPinArray[0]);
+                    Thread.sleep(1000);
+                    backgroundConsoleWorker.runConsoleCommand(adbPath + " shell input text " + otaPinArray[1]);
+                    Thread.sleep(1000);
+                    backgroundConsoleWorker.runConsoleCommand(adbPath + " shell input text " + otaPinArray[2]);
+                    Thread.sleep(500);
+                    backgroundConsoleWorker.runConsoleCommand(adbPath + " shell input keyevent 66");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).execute();
     }
 
     private void checkAdbPath() {
 
-    	String customAdbPath = mAdbPathTextField.getText().trim();
-    	final String adbPath = customAdbPath.isEmpty() ? "adb" : customAdbPath;
+        final String adbPath = getAdbCommand();
 
-        // define a SwingWorker to run in background  
-        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-
-            private void runCommandAndPrintOutput(String command) throws IOException {
-                StringBuilder sb = new StringBuilder();
-                String printline;
-
-                Process process = Runtime.getRuntime().exec(command);
-                BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-                while ((printline = input.readLine()) != null) {
-                    System.out.println(printline);
-                    sb.append(printline).append("\n");
-                    mConsoleOutputJTextPane.setText(sb.toString());
-                }
-                input.close(); 
+        new BackgroundConsoleWorker(new BackgroundConsoleWorkerExecutorLinePrinter() {
+            @Override
+            public void doInBackground(BackgroundConsoleWorker backgroundConsoleWorker) {
+                backgroundConsoleWorker.runConsoleCommand(adbPath + " devices");
             }
+        }).execute();
 
-            public Void doInBackground() throws IOException, InterruptedException {  
-                runCommandAndPrintOutput(adbPath + " devices");
-                return null;  
-            }  
-        };  
-
-                // execute the background thread  
-                worker.execute();
     }
 
-    
-    private ActionListener mSaveActionListener = new ActionListener() {
-    	
-    	public void actionPerformed(ActionEvent e) {
-    		prepareInputTexts();
-    		
-    		if(trySaveCurrent()) {
-    			showMessageDialog("Saved");
-    		}
-    	}
-    };
-
-    private ActionListener mCheckAdbActionListener = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-        	checkAdbPath();
-        }
-    };
+    private String getAdbCommand() {
+        String customAdbPath = mAdbPathTextField.getText().trim();
+        final String adbPath = customAdbPath.isEmpty() ? "adb" : customAdbPath;
+        return adbPath;
+    }
 
     private boolean isCurrentItemAlreadyExist() {
         boolean isItemAlreadyExist = false;
@@ -476,9 +483,8 @@ public class Main {
         return isItemAlreadyExist;
     }
 
-
-    public boolean updateStorage() {
-        if(mStorageData == null) {
+    private boolean updateStorage() {
+        if (mStorageData == null) {
             mStorageData = new ProvisioningData();
         }
 
@@ -487,24 +493,12 @@ public class Main {
         data.otaPin      = mOtaPinTextField.getText();
         data.description = mDescriptionTextField.getText();
 
-        if(!mStorageData.getList().contains(data)) {
+        if (!mStorageData.getList().contains(data)) {
             mStorageData.add(data);
 
-            FileOutputStream fos = null;
-            try {
-                fos = new FileOutputStream(ProjectConst.DATA_FILE_NAME);
-                mXstream.toXML(mStorageData, fos);
-            } catch (FileNotFoundException e1) {
-                e1.printStackTrace();
+            boolean isFileAccessGranted = StorageUtils.updateStorageData(mStorageData);
+            if (!isFileAccessGranted) {
                 showErrorDialog("Storage access denny");
-            } finally {
-                try {
-                    if(fos != null) {
-                        fos.close();
-                    }
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
             }
         } else {
             showErrorDialog("Entry already exist");
@@ -514,59 +508,13 @@ public class Main {
         return true;
     }
 
-    protected void setLastItemSelected() {
+    private void setLastItemSelected() {
         int itemCount = mHistoryComboBox.getItemCount();
         if(itemCount > 0) {
             mHistoryComboBox.setSelectedIndex(itemCount - 1);
         }
     }
 
-
-    ActionListener mReplaceActionListener = new ActionListener() {
-
-        public void actionPerformed(ActionEvent arg0) {
-            int currentItem = mHistoryComboBox.getSelectedIndex();
-            prepareInputTexts();
-
-            if(currentItem != -1) {
-
-                if(validateFields()) {
-
-                    if(isCurrentItemAlreadyExist()) {
-                        showErrorDialog("Entry already exist");
-                    } else {
-                        String itemDescription = mStorageData.getList().get(currentItem).description;
-                        boolean result = showConfirmDialog("Are you sure you want to replace with\n\n\"" + itemDescription + "\"\n\n");
-
-                        if(result && trySaveCurrent()) {
-                            mHistoryComboBox.removeItemAt(currentItem);
-
-                            mStorageData.getList().remove(currentItem);
-
-                            FileOutputStream fos = null;
-                            try {
-                                fos = new FileOutputStream(ProjectConst.DATA_FILE_NAME);
-                                mXstream.toXML(mStorageData, fos);
-                            } catch (FileNotFoundException e1) {
-                                e1.printStackTrace();
-                                showErrorDialog("Storage access denny");
-                            } finally {
-                                try {
-                                    if(fos != null) {
-                                        fos.close();
-                                    }
-                                } catch (IOException e1) {
-                                    e1.printStackTrace();
-                                }
-                            }
-                            setLastItemSelected();
-                        }
-                    }
-
-                }
-            }
-        }
-    };
 
     private boolean validateFields() {
         String emailText  = mEmailTextField.getText();
@@ -606,90 +554,6 @@ public class Main {
         mOtaPinTextField.setText(otaPin.trim());
     }
 
-
-    ActionListener mRemoveActionListener = new ActionListener() {
-        public void actionPerformed(ActionEvent arg0) {
-            int currentItem = mHistoryComboBox.getSelectedIndex();
-
-            if(currentItem != -1) {
-                String itemDescription = mStorageData.getList().get(currentItem).description;
-                boolean result = showConfirmDialog("Are you sure you want to remove\n\n\"" + itemDescription + "\"\n\n");
-
-                if(result) {
-                    mHistoryComboBox.removeItemAt(currentItem);
-
-                    mStorageData.getList().remove(currentItem);
-
-                    FileOutputStream fos = null;
-                    try {
-                        fos = new FileOutputStream(ProjectConst.DATA_FILE_NAME);
-                        mXstream.toXML(mStorageData, fos);
-                    } catch (FileNotFoundException e1) {
-                        e1.printStackTrace();
-                        showErrorDialog("Storage access denny");
-                    } finally {
-                        try {
-                            if(fos != null) {
-                                fos.close();
-                            }
-                        } catch (IOException e1) {
-                            e1.printStackTrace();
-                        }
-                    }
-
-                    fillInitialDisplayFields();
-                }
-            }
-        }
-    };
-
-//    private String readFileContent(String filePath) throws IOException {
-//        String fileContentString = "";
-//        BufferedReader br = new BufferedReader(new FileReader(filePath));
-//        try {
-//            StringBuilder sb = new StringBuilder();
-//            String line = br.readLine();
-//
-//            while (line != null) {
-//                sb.append(line);
-//                sb.append(System.lineSeparator());
-//                line = br.readLine();
-//            }
-//            fileContentString = sb.toString();
-//        } finally {
-//            br.close();
-//        }
-//
-//        return fileContentString;
-//    }
-
-
-    private String readFileContentFromResource(String pathToResouceTextFile) {
-        String fileContentString = "";
-
-        InputStream stream = Main.class.getResourceAsStream("/"+pathToResouceTextFile);
-
-        if (stream != null) {
-            Scanner input = null;
-            try {
-                input = new Scanner (stream);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            StringBuilder sb = new StringBuilder();
-
-            while (input.hasNextLine()) {
-                sb.append(input.nextLine());
-                sb.append(System.lineSeparator());
-            }
-
-            fileContentString = sb.toString();
-        }
-
-        return fileContentString;
-    }
-
-
     private boolean validateProvisioningData(String emailText, String otaPinText) {
         boolean isValid = false;
 
@@ -722,7 +586,6 @@ public class Main {
         if(otaPinText == null) {
             return false;
         }
-//        final String OTA_PIN_PATTERN = "^[\\w]+\\-[\\w]+\\-[\\w]+\\-[\\w]+$";
         final String OTA_PIN_PATTERN = "^[\\w]+\\-[\\w]+\\-[\\w]+$";
         
         Pattern pattern = Pattern.compile(OTA_PIN_PATTERN);
@@ -739,4 +602,20 @@ public class Main {
             System.out.println("Could not load program icon.");
          }
     }
+
+    private abstract class BackgroundConsoleWorkerExecutorLinePrinter implements BackgroundConsoleWorkerExecutor {
+        StringBuilder sb = new StringBuilder();
+    
+        @Override
+        public void printOutputLine(String printline) {
+            System.out.println(printline);
+            sb.append(printline).append("\n");
+            mConsoleOutputJTextPane.setText(sb.toString());
+        }
+    
+        @Override
+        public abstract void doInBackground(BackgroundConsoleWorker backgroundConsoleWorker);
+        
+    }
+
 }

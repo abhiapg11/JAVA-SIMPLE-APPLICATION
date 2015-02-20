@@ -6,3 +6,4 @@
 0.3.1 - Added trimming input fields for email and PIN when press: "Save", "Replace" and "Provision" button
 0.3.2 - Changed build JAVA version to 1.6
       - Fixed "OTA PIN" label position
+0.4.0 - Added ADB path configuration possibility
