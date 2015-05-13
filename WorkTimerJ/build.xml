@@ -3,17 +3,17 @@
     <!--this file was created by Eclipse Runnable JAR Export Wizard-->
     <!--ANT 1.7 is required                                        -->
     <target name="create_run_jar">
-        <jar destfile="/home/tjo/WORK/eclipse_workspace_dev_1/WorkTimerJ/WorkTimerJ.jar">
+        <jar destfile="C:/Users/Tomek/workspace/workspace_desktop/WorkTimerJ/WorkTimerJ.jar">
             <manifest>
                 <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
                 <attribute name="Rsrc-Main-Class" value="tomasz.jokiel.worktimer.WorkTimerJ"/>
                 <attribute name="Class-Path" value="."/>
-                <attribute name="Rsrc-Class-Path" value="./ junit.jar org.hamcrest.core_1.3.0.v201303031735.jar"/>
+                <attribute name="Rsrc-Class-Path" value="./ junit.jar org.hamcrest.core_1.1.0.v20090501071000.jar"/>
             </manifest>
             <zipfileset src="jar-in-jar-loader.zip"/>
-            <fileset dir="/home/tjo/WORK/eclipse_workspace_dev_1/WorkTimerJ/bin"/>
-            <zipfileset dir="/opt/eclipse/plugins/org.junit_4.11.0.v201303080030" includes="junit.jar"/>
-            <zipfileset dir="/opt/eclipse/plugins" includes="org.hamcrest.core_1.3.0.v201303031735.jar"/>
+            <fileset dir="C:/Users/Tomek/workspace/workspace_desktop/WorkTimerJ/bin"/>
+            <zipfileset dir="C:\eclipse_java\plugins\org.junit_4.10.0.v4_10_0_v20120426-0900" includes="junit.jar"/>
+            <zipfileset dir="C:\eclipse_java\plugins" includes="org.hamcrest.core_1.1.0.v20090501071000.jar"/>
         </jar>
     </target>
 </project>

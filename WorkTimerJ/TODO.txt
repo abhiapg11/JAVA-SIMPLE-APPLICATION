@@ -1,4 +1,3 @@
-- otoczka podœwietlaj¹ca element albo zrobenie go przeŸroczystym trochê, gdy mo¿na go upuœciæ na dany TUB-C, czerwona otoczka gdy nad œmietnikiem lub gdy TUB po raz pierwszy i jeszcze nigdzie nie wrzucony
 - dodaæ wypluwanie pliku stylów XMLa z resourców
 - automatyczny podzia³ bazy danych na pliki miesiêcy
 - specjalny TUB-C na TUBy nadgodzinowe i niedogodzinowe, które bêd¹ uzupe³niane w przypadku zakoñczenia dnia tym co siê uzbiera³o?

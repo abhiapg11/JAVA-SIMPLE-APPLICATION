@@ -34,6 +34,7 @@ public class TimeUnitBlock extends JPanel {
     protected Point mMousePositinInsideRelWhenPressed = new Point();
     protected Point mLocationWhenPressed = new Point();
     private OnTimeUnitBlockDroppedListener mOnTimeUnitBlockDroppedListener;
+    private OnTimeUnitBlockMoveListener mOnTimeUnitBlockMoveListener;
     private OnMouseDoubleClickListener mOnMouseDoubleClickListener;
     private TimeUnitBlocksContainer mTimeUnitBlocksContainerWhichInside;
     private Color mTimeTextColor = Color.BLACK;
@@ -54,6 +55,10 @@ public class TimeUnitBlock extends JPanel {
     
     public void setOnTimeUnitBlockDroppedListener(OnTimeUnitBlockDroppedListener listener) {
         mOnTimeUnitBlockDroppedListener = listener;
+    }
+    
+    public void setOnTimeUnitBlockMoveListener(OnTimeUnitBlockMoveListener listener) {
+        mOnTimeUnitBlockMoveListener = listener;
     }
 
     public void setOnMouseDoubleClickListener(OnMouseDoubleClickListener listener) {
@@ -209,13 +214,19 @@ public class TimeUnitBlock extends JPanel {
 //    }
 
     private void handleMouseDragged(final TimeUnitBlock timeUnitBlock, MouseEvent mouseEvent) {
+        handleBoduColorChangeWhenIsInMove();
         Point parentLocation = timeUnitBlock.getParent().getLocationOnScreen();
         Rectangle parentTimeUnitBlockBounds = timeUnitBlock.getParent().getBounds();
         Rectangle timeUnitBlockBounds = timeUnitBlock.getBounds();
 
         Rectangle timeUnitBlockBoundsAfterMove = calculateTimeUnitBlockBoundsAfterMove(mouseEvent, parentLocation, parentTimeUnitBlockBounds, timeUnitBlockBounds);
-
         timeUnitBlock.setBounds(timeUnitBlockBoundsAfterMove);
+    }
+
+    private void handleBoduColorChangeWhenIsInMove() {
+        boolean isInsideTimeUnitBlockContainerDuringMove =  mOnTimeUnitBlockMoveListener != null && mOnTimeUnitBlockMoveListener.onTimeUnitBlockMoved(this);
+        Color bodyColor = isInsideTimeUnitBlockContainerDuringMove ? mColorOriginal : Color.LIGHT_GRAY;
+        TimeUnitBlock.super.setBackground(bodyColor);
     }
     
     private Rectangle calculateTimeUnitBlockBoundsAfterMove(MouseEvent mouseEvent, Point parentLocation,
@@ -253,6 +264,14 @@ public class TimeUnitBlock extends JPanel {
         public void onTimeUnitBlockDragged(TimeUnitBlock timeUnitBlock);
     }
 
+    public interface OnTimeUnitBlockMoveListener {
+        /**
+         * @param timeUnitBlock this
+         * @return true if inside any TimeUnitBlockContaiber
+         */
+        public boolean onTimeUnitBlockMoved(TimeUnitBlock timeUnitBlock);
+    }
+
     protected TimeUnitBlock clone(){
         TimeUnitBlock clone = new TimeUnitBlock(mTimeAnountInSeconds);
         clone.mCloneOf = this;
@@ -262,6 +281,7 @@ public class TimeUnitBlock extends JPanel {
         clone.setBackground(mColorOriginal);
         clone.setBounds(getBounds());
         clone.setOnTimeUnitBlockDroppedListener(mOnTimeUnitBlockDroppedListener);
+        clone.setOnTimeUnitBlockMoveListener(mOnTimeUnitBlockMoveListener);
         clone.setOnMouseDoubleClickListener(mOnMouseDoubleClickListener);
         return clone;
     }

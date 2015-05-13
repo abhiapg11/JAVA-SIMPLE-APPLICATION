@@ -20,6 +20,7 @@ import tomasz.jokiel.worktimer.DataReader.WorkTimmerSummary;
 import tomasz.jokiel.worktimer.DayliTimerTaskGroup.OnUpdateDayliTimerValueListener;
 import tomasz.jokiel.worktimer.OnMouseClickListenerEmptyTimeUnitBlocksContainer.OnRemoveAllTimeUnitBlocksFromCointainerListener;
 import tomasz.jokiel.worktimer.TimeUnitBlock.OnTimeUnitBlockDroppedListener;
+import tomasz.jokiel.worktimer.TimeUnitBlock.OnTimeUnitBlockMoveListener;
 import tomasz.jokiel.worktimer.TimeUnitBlocksContainer.OnConvertAddRemoveTimeUnitBlockListener;
 import tomasz.jokiel.worktimer.WindowCloseListener.OnWindowCloseListener;
 
@@ -359,27 +360,40 @@ public class WorkTimerJ {
             }
         };
 
+        OnTimeUnitBlockMoveListener onTimeUnitBlockMoveListener = new OnTimeUnitBlockMoveListener() {
+            
+            @Override
+            public boolean onTimeUnitBlockMoved(TimeUnitBlock timeUnitBlock) {
+                return getContainerInWhichTimeUnitBlockIfAny(timeUnitBlock) != null;
+            }
+        };
+
         mFiveMinuteTimeUnitBlock.setBackground(Color.MAGENTA);
         mFiveMinuteTimeUnitBlock.setBounds(275, 236, TUB_WIDTH, TUB_HEIGHT);
         mFiveMinuteTimeUnitBlock.setOnTimeUnitBlockDroppedListener(onTimeUnitBlockDroppedListener);
+        mFiveMinuteTimeUnitBlock.setOnTimeUnitBlockMoveListener(onTimeUnitBlockMoveListener);
 
         mTenMinutesTimeUnitBlock.setBackground(Color.ORANGE);
         mTenMinutesTimeUnitBlock.setBounds(299, 236, TUB_WIDTH, TUB_HEIGHT);
         mTenMinutesTimeUnitBlock.setOnTimeUnitBlockDroppedListener(onTimeUnitBlockDroppedListener);
+        mTenMinutesTimeUnitBlock.setOnTimeUnitBlockMoveListener(onTimeUnitBlockMoveListener);
 
         mHalfHourTimeUnitBlock.setBackground(Color.GREEN);
         mHalfHourTimeUnitBlock.setBounds(323, 236, TUB_WIDTH, TUB_HEIGHT);
         mHalfHourTimeUnitBlock.setOnTimeUnitBlockDroppedListener(onTimeUnitBlockDroppedListener);
+        mHalfHourTimeUnitBlock.setOnTimeUnitBlockMoveListener(onTimeUnitBlockMoveListener);
         
         mOneHourTimeUnitBlock.setBackground(Color.BLUE);
         mOneHourTimeUnitBlock.setTimeTextColor(Color.WHITE);
         mOneHourTimeUnitBlock.setBounds(347, 236, TUB_WIDTH, TUB_HEIGHT);
         mOneHourTimeUnitBlock.setOnTimeUnitBlockDroppedListener(onTimeUnitBlockDroppedListener);
+        mOneHourTimeUnitBlock.setOnTimeUnitBlockMoveListener(onTimeUnitBlockMoveListener);
 
         mTwoHoursTimeUnitBlock.setBackground(Color.BLACK);
         mTwoHoursTimeUnitBlock.setTimeTextColor(Color.WHITE);
         mTwoHoursTimeUnitBlock.setBounds(371, 236, TUB_WIDTH, TUB_HEIGHT);
         mTwoHoursTimeUnitBlock.setOnTimeUnitBlockDroppedListener(onTimeUnitBlockDroppedListener);
+        mTwoHoursTimeUnitBlock.setOnTimeUnitBlockMoveListener(onTimeUnitBlockMoveListener);
 
         frame.getContentPane().add(mFiveMinuteTimeUnitBlock);
         frame.getContentPane().add(mTenMinutesTimeUnitBlock);
