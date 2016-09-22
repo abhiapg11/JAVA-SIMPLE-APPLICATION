@@ -3,6 +3,10 @@
 	version="1.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+    <xsl:template match="WT_WINDOW_CLOSE_CONFIG_DATA_TAG_NAME" priority="0" /> <!-- Hidden -->
+    <xsl:template match="WT_CONFIG_DATA" priority="0" /> <!-- Hidden -->
+    
+     
 	<xsl:template match="WT_SUMMARY">
 		<html>
 			<head>
